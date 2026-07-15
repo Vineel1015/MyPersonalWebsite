@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vineel Nadakuditi — Software Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #16161d;
+    --ink-soft: #55555f;
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --accent: #4f46e5;
+    --accent-soft: #eef2ff;
+    --line: #e8e8ec;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  ::selection { background: var(--accent); color: #fff; }
+
+  /* ---------- Nav ---------- */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.1rem clamp(1.5rem, 5vw, 4rem);
+    background: rgba(250,250,250,.8);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+    opacity: 0;
+  }
+  .logo { font-weight: 800; font-size: 1.05rem; letter-spacing: -0.02em; text-decoration: none; color: var(--ink); }
+  .logo span { color: var(--accent); }
+  nav ul { display: flex; gap: 2rem; list-style: none; }
+  nav ul a {
+    text-decoration: none; color: var(--ink-soft); font-size: .9rem; font-weight: 500;
+    transition: color .2s;
+  }
+  nav ul a:hover { color: var(--accent); }
+
+  /* ---------- Hero ---------- */
+  header {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 0 clamp(1.5rem, 8vw, 8rem);
+    position: relative;
+  }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent); font-size: .85rem; margin-bottom: 1.2rem;
+    opacity: 0;
+  }
+  h1 {
+    font-size: clamp(2.6rem, 8vw, 5.5rem);
+    font-weight: 800; letter-spacing: -0.03em; line-height: 1.05;
+  }
+  h1 .letter { display: inline-block; opacity: 0; }
+  .tagline {
+    margin-top: 1.4rem; font-size: clamp(1.05rem, 2vw, 1.3rem);
+    color: var(--ink-soft); max-width: 34rem; opacity: 0;
+  }
+  .hero-cta { margin-top: 2.4rem; display: flex; gap: 1rem; opacity: 0; }
+  .btn {
+    display: inline-block; text-decoration: none; font-weight: 600; font-size: .95rem;
+    padding: .8rem 1.6rem; border-radius: 10px; transition: transform .2s, box-shadow .2s;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(79,70,229,.3); }
+  .btn-ghost { border: 1px solid var(--line); color: var(--ink); background: var(--surface); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+  /* floating shapes */
+  .shape { position: absolute; pointer-events: none; opacity: .15; }
+  .shape svg { width: 100%; height: 100%; overflow: visible; }
+  .shape polygon {
+    fill: none; stroke: var(--accent); stroke-width: 2.5;
+    stroke-linejoin: round; vector-effect: non-scaling-stroke;
+  }
+  .scroll-hint {
+    position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    font-family: 'JetBrains Mono', monospace; font-size: .75rem; color: var(--ink-soft);
+    opacity: 0;
+  }
+
+  /* ---------- Sections ---------- */
+  section { padding: clamp(4rem, 10vw, 7rem) clamp(1.5rem, 8vw, 8rem); }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: var(--accent);
+    margin-bottom: .6rem;
+  }
+  h2 {
+    font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -0.02em;
+    margin-bottom: 2rem;
+  }
+  .reveal { opacity: 0; }
+
+  /* About */
+  .about-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 3rem; align-items: start; }
+  .about-grid p { color: var(--ink-soft); margin-bottom: 1rem; max-width: 40rem; }
+  .fact-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 1.5rem;
+  }
+  .fact-card ul { list-style: none; }
+  .fact-card li {
+    display: flex; justify-content: space-between; padding: .6rem 0;
+    border-bottom: 1px solid var(--line); font-size: .9rem;
+  }
+  .fact-card li:last-child { border-bottom: none; }
+  .fact-card li span:first-child { color: var(--ink-soft); }
+  .fact-card li span:last-child { font-weight: 600; }
+
+  /* Projects */
+  #projects { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .projects-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 1.5rem;
+  }
+  .card {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 16px;
+    padding: 1.8rem; position: relative; overflow: hidden;
+    transition: transform .25s, box-shadow .25s, border-color .25s;
+    display: flex; flex-direction: column;
+    text-decoration: none; color: inherit;
+  }
+  .card-link {
+    font-family: 'JetBrains Mono', monospace; font-size: .78rem;
+    color: var(--accent); margin-top: 1rem; font-weight: 500;
+  }
+  .card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(22,22,29,.08); border-color: var(--accent); }
+  .card-num {
+    font-family: 'JetBrains Mono', monospace; font-size: .75rem; color: var(--accent);
+    background: var(--accent-soft); padding: .25rem .6rem; border-radius: 6px;
+    align-self: flex-start; margin-bottom: 1rem;
+  }
+  .card h3 { font-size: 1.2rem; margin-bottom: .5rem; letter-spacing: -0.01em; }
+  .card p { color: var(--ink-soft); font-size: .92rem; flex: 1; }
+  .tags { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: 1.2rem; }
+  .tags span {
+    font-family: 'JetBrains Mono', monospace; font-size: .7rem; color: var(--ink-soft);
+    border: 1px solid var(--line); padding: .2rem .55rem; border-radius: 99px;
+  }
+
+  /* Experience */
+  .xp {
+    position: relative; padding: 0 0 2.8rem 2.4rem;
+    border-left: 2px solid var(--line); max-width: 46rem;
+  }
+  .xp:last-of-type { padding-bottom: .5rem; }
+  .xp::before {
+    content: ''; position: absolute; left: -8px; top: 4px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); border: 3px solid var(--bg);
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  .xp-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: .3rem; }
+  .xp-head h3 { font-size: 1.25rem; letter-spacing: -0.01em; }
+  .xp-head h3 span { color: var(--accent); }
+  .xp-date { font-family: 'JetBrains Mono', monospace; font-size: .78rem; color: var(--ink-soft); }
+  .xp-co { color: var(--ink-soft); font-size: .92rem; margin: .15rem 0 .8rem; font-weight: 500; }
+  .xp p.blurb { color: var(--ink-soft); font-size: .95rem; max-width: 42rem; }
+  .stats { display: flex; flex-wrap: wrap; gap: 1.2rem 2.5rem; margin-top: 1.3rem; }
+  .stat .num {
+    font-size: 2rem; font-weight: 800; color: var(--accent);
+    letter-spacing: -0.02em; line-height: 1.1; display: block;
+  }
+  .stat .lbl {
+    font-family: 'JetBrains Mono', monospace; font-size: .72rem;
+    color: var(--ink-soft); display: block; max-width: 11rem;
+  }
+
+  /* Skills */
+  #skills { background: var(--surface); border-top: 1px solid var(--line); }
+  .skill-group { margin-bottom: 2.2rem; }
+  .skill-group h4 {
+    font-family: 'JetBrains Mono', monospace; font-size: .8rem;
+    color: var(--ink-soft); font-weight: 500; margin-bottom: .9rem;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: .6rem; }
+  .chip {
+    font-size: .85rem; font-weight: 500; color: var(--ink-soft);
+    border: 1px solid var(--line); background: var(--bg);
+    padding: .45rem 1rem; border-radius: 99px; opacity: 0;
+    transition: transform .2s, border-color .2s, color .2s;
+  }
+  .chip:hover { transform: translateY(-3px) rotate(-1deg); border-color: var(--accent); color: var(--accent); }
+  .chip-hot {
+    background: var(--accent-soft); border-color: var(--accent);
+    color: var(--accent); font-weight: 600; font-size: .95rem;
+    padding: .6rem 1.25rem;
+  }
+  .chip-hot:hover { background: var(--accent); color: #fff; }
+  .skills-note { color: var(--ink-soft); font-size: .9rem; max-width: 38rem; margin-bottom: 2rem; }
+
+  /* Contact */
+  #contact { text-align: center; }
+  #contact p { color: var(--ink-soft); max-width: 30rem; margin: 0 auto 2rem; }
+  .socials { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; }
+  .socials a {
+    font-family: 'JetBrains Mono', monospace; font-size: .85rem;
+    color: var(--ink-soft); text-decoration: none; padding: .5rem 1rem;
+    border: 1px solid var(--line); border-radius: 99px; transition: all .2s;
+  }
+  .socials a:hover { color: var(--accent); border-color: var(--accent); transform: translateY(-2px); }
+
+  footer {
+    text-align: center; padding: 2rem; font-size: .8rem; color: var(--ink-soft);
+    border-top: 1px solid var(--line);
+  }
+
+  @media (max-width: 720px) {
+    .about-grid { grid-template-columns: 1fr; }
+    nav ul { gap: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <a class="logo" href="#top">vineel<span>.</span></a>
+  <ul>
+    <li><a href="#about">About</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<header id="top">
+  <p class="eyebrow">// hello, world</p>
+  <h1 id="hero-name">Vineel Nadakuditi</h1>
+  <p class="tagline">I build AI-powered products — agentic workflows, data pipelines, and automation that saves real teams real hours. Currently shipping AI tooling at Bristol Myers Squibb.</p>
+  <div class="hero-cta">
+    <a class="btn btn-primary" href="#projects">See my work</a>
+    <a class="btn btn-ghost" href="#contact">Get in touch</a>
+  </div>
+  <p class="scroll-hint">scroll ↓</p>
+</header>
+
+<section id="about">
+  <div class="reveal">
+    <p class="section-label">01 / about</p>
+    <h2>A bit about me</h2>
+  </div>
+  <div class="about-grid">
+    <div class="reveal">
+      <p>I'm a computer science and data analytics student at Rutgers (4.0 GPA) who ships production software. My sweet spot is the new AI paradigm: agentic workflows, MCP, RAG, and human-in-the-loop systems that turn thousands of hours of manual work into minutes.</p>
+      <p>Right now I'm at Bristol Myers Squibb leading development on an AI-powered periodic review tool that cut review effort by 80%. Before that, I taught 800 students as Head TA and built data tooling for a Newark nonprofit.</p>
+      <p>This site itself is a small playground: every bit of motion on it is powered by <a href="https://animejs.com/" style="color:var(--accent)">anime.js</a>.</p>
+    </div>
+    <div class="fact-card reveal">
+      <ul>
+        <li><span>Currently</span><span>AI Product Delivery @ BMS</span></li>
+        <li><span>Education</span><span>Rutgers CS + Data Analytics '26</span></li>
+        <li><span>GPA</span><span>4.0 / 4.0, Dean's List</span></li>
+        <li><span>Certified</span><span>AWS Cloud Practitioner</span></li>
+        <li><span>Based in</span><span>New York</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="reveal">
+    <p class="section-label">02 / experience</p>
+    <h2>Where I've made an impact</h2>
+  </div>
+
+  <div class="xp reveal">
+    <div class="xp-head">
+      <h3>AI Product Delivery Intern <span>→</span></h3>
+      <span class="xp-date">May 2026 — Present</span>
+    </div>
+    <p class="xp-co">Bristol Myers Squibb · Newark, NJ</p>
+    <p class="blurb">Leading development of the Periodic Review Automation tool — an AI document-aggregation system with a human-in-the-loop analyzer chatbot that scores 1000s of documents with confidence levels, so reviewers focus judgment where it matters. Backed by a 150+ case test suite that kept 50+ PR changes shipping with zero significant downtime.</p>
+    <div class="stats">
+      <div class="stat"><span class="num" data-count="80" data-suffix="%">0</span><span class="lbl">less effort per review</span></div>
+      <div class="stat"><span class="num" data-count="70" data-suffix="%">0</span><span class="lbl">fewer missed reviews company-wide</span></div>
+      <div class="stat"><span class="num" data-count="85" data-suffix="%">0</span><span class="lbl">automated test coverage</span></div>
+    </div>
+  </div>
+
+  <div class="xp reveal">
+    <div class="xp-head">
+      <h3>Head Teaching Assistant <span>→</span></h3>
+      <span class="xp-date">Jan 2025 — May 2026</span>
+    </div>
+    <p class="xp-co">Rutgers Computer Science Department · New Brunswick, NJ</p>
+    <p class="blurb">Built 12 weekly course modules spanning front-end development, computer architecture, and data structures, and co-developed an online help forum with Professor Lau. Led two recitation sections whose students finished 5% above the course average GPA.</p>
+    <div class="stats">
+      <div class="stat"><span class="num" data-count="800" data-suffix="">0</span><span class="lbl">students taught weekly</span></div>
+      <div class="stat"><span class="num" data-count="90" data-suffix="%">0</span><span class="lbl">faster time-to-help via forum</span></div>
+      <div class="stat"><span class="num" data-count="5000" data-suffix="+">0</span><span class="lbl">forum responses generated</span></div>
+    </div>
+  </div>
+
+  <div class="xp reveal">
+    <div class="xp-head">
+      <h3>Data Analyst Intern <span>→</span></h3>
+      <span class="xp-date">May 2023 — Sep 2024</span>
+    </div>
+    <p class="xp-co">Project Innovate Newark · Newark, NJ</p>
+    <p class="blurb">Aggregated financial and transaction data from multiple inflows into data lakes to surface overspending and underbudgeting patterns on a $50,000+ account, and built proprietary balance dashboards and automated messaging bots for the finance team.</p>
+    <div class="stats">
+      <div class="stat"><span class="num" data-count="50" data-prefix="$" data-suffix="K+">0</span><span class="lbl">account visibility unlocked</span></div>
+      <div class="stat"><span class="num" data-count="30" data-suffix="%">0</span><span class="lbl">time saved via automation</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="reveal">
+    <p class="section-label">03 / skills</p>
+    <h2>Built for the AI era</h2>
+    <p class="skills-note">I work where the industry is heading — agentic systems, LLM tooling, and cloud-scale data — on top of solid engineering fundamentals.</p>
+  </div>
+  <div class="skill-group reveal">
+    <h4>// AI &amp; agentic systems</h4>
+    <div class="chips">
+      <span class="chip chip-hot">Agentic Workflows</span>
+      <span class="chip chip-hot">AI Agents &amp; MCP</span>
+      <span class="chip chip-hot">RAG</span>
+      <span class="chip chip-hot">LangChain</span>
+      <span class="chip chip-hot">Claude Code</span>
+      <span class="chip chip-hot">OpenAI API</span>
+      <span class="chip chip-hot">Human-in-the-Loop AI</span>
+      <span class="chip chip-hot">PyTorch</span>
+    </div>
+  </div>
+  <div class="skill-group reveal">
+    <h4>// cloud &amp; data engineering</h4>
+    <div class="chips">
+      <span class="chip">AWS (Certified Cloud Practitioner)</span>
+      <span class="chip">Kafka</span>
+      <span class="chip">Databricks</span>
+      <span class="chip">Snowflake SQL</span>
+      <span class="chip">Data Lakes</span>
+      <span class="chip">AWS Glue / Athena / S3 / EC2</span>
+      <span class="chip">Azure</span>
+      <span class="chip">Tableau</span>
+      <span class="chip">Power BI</span>
+      <span class="chip">FastAPI</span>
+    </div>
+  </div>
+  <div class="skill-group reveal">
+    <h4>// languages &amp; core</h4>
+    <div class="chips">
+      <span class="chip">Python</span>
+      <span class="chip">SQL</span>
+      <span class="chip">JavaScript</span>
+      <span class="chip">R</span>
+      <span class="chip">C</span>
+      <span class="chip">SwiftUI</span>
+      <span class="chip">Flutter / Dart</span>
+      <span class="chip">Frontend Development</span>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="reveal">
+    <p class="section-label">04 / projects</p>
+    <h2>Things I've built</h2>
+  </div>
+  <div class="projects-grid">
+    <a class="card reveal" href="https://www.youtube.com/watch?v=j6ofxc26VMc" target="_blank">
+      <span class="card-num">001</span>
+      <h3>KicNic — HealthHacks 2024</h3>
+      <p>Health-tracking app built on Apple HealthKit data. Engineered time-series features and trained an LSTM classifier to detect hand movements and track heart rate at 97% accuracy.</p>
+      <div class="tags"><span>PyTorch</span><span>Pandas</span><span>Swift</span><span>Firebase</span><span>React</span></div>
+      <span class="card-link">watch demo ↗</span>
+    </a>
+    <a class="card reveal" href="https://github.com/Vineel1015/Data-Migration-Project" target="_blank">
+      <span class="card-num">002</span>
+      <h3>YouTube Channel Analytics</h3>
+      <p>Data migration pipeline pulling channel and video stats through the YouTube Data v3 API, then cleaning, structuring, and visualizing engagement trends into an adjustable report.</p>
+      <div class="tags"><span>Python</span><span>YouTube API</span><span>Pandas</span><span>Seaborn</span></div>
+      <span class="card-link">view code ↗</span>
+    </a>
+    <div class="card reveal">
+      <span class="card-num">003</span>
+      <h3>Real-Time Stock Market Pipeline</h3>
+      <p>Streaming pipeline with Kafka producers, brokers, and consumers feeding AWS — partition-tuned for 50% faster retrieval, with cleaning and decomposition for time-series analysis.</p>
+      <div class="tags"><span>Kafka</span><span>Athena</span><span>S3</span><span>AWS Glue</span><span>EC2</span></div>
+    </div>
+    <div class="card reveal">
+      <span class="card-num">004</span>
+      <h3>Vertex Studio AI — Supervised ML</h3>
+      <p>Improved Gemini-Pro output quality by 30% on NYC open-park data tasks through better training-set correlation, and streamlined ETL to cut inference time 20% across 300 accounts.</p>
+      <div class="tags"><span>AWS</span><span>Databricks</span><span>FastAPI</span><span>Python</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="reveal">
+    <p class="section-label">05 / contact</p>
+    <h2>Let's talk</h2>
+    <p>Whether it's an opportunity, a collaboration, or just a good idea — my inbox is open.</p>
+    <a class="btn btn-primary" href="mailto:vineelnadakuditi@gmail.com">vineelnadakuditi@gmail.com</a>
+    <div class="socials">
+      <a href="https://github.com/Vineel1015" target="_blank">github</a>
+      <a href="https://www.linkedin.com/in/vineel-nadakuditi/" target="_blank">linkedin</a>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 Vineel Nadakuditi · built with anime.js</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+<script>
+  // --- Split hero name into letters ---
+  const heroName = document.getElementById('hero-name');
+  heroName.innerHTML = heroName.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
+
+  // --- Intro timeline ---
+  anime.timeline({ easing: 'easeOutExpo' })
+    .add({ targets: '#navbar', opacity: [0, 1], translateY: [-20, 0], duration: 700 })
+    .add({ targets: '.eyebrow', opacity: [0, 1], translateX: [-20, 0], duration: 600 }, '-=400')
+    .add({
+      targets: '#hero-name .letter',
+      opacity: [0, 1],
+      translateY: [40, 0],
+      rotateZ: [8, 0],
+      duration: 900,
+      delay: anime.stagger(35)
+    }, '-=300')
+    .add({ targets: '.tagline', opacity: [0, 1], translateY: [20, 0], duration: 700 }, '-=500')
+    .add({ targets: '.hero-cta', opacity: [0, 1], translateY: [20, 0], duration: 700 }, '-=450')
+    .add({ targets: '.scroll-hint', opacity: [0, .8], duration: 600 }, '-=300');
+
+  // --- Scroll hint bob ---
+  anime({
+    targets: '.scroll-hint',
+    translateY: [0, 8],
+    direction: 'alternate',
+    loop: true,
+    duration: 900,
+    easing: 'easeInOutSine'
+  });
+
+  // --- Floating morphing shapes in hero (circle → square → X → circle) ---
+  const header = document.querySelector('header');
+  const N = 24; // shared vertex count so shapes interpolate cleanly
+
+  // Circle: N points around a ring
+  const circlePts = Array.from({ length: N }, (_, i) => {
+    const a = (i / N) * Math.PI * 2 - Math.PI / 2;
+    return [50 + 45 * Math.cos(a), 50 + 45 * Math.sin(a)];
+  });
+  // Square: N points distributed along the perimeter (6 per side)
+  const squarePts = Array.from({ length: N }, (_, i) => {
+    const t = i / N * 4, side = Math.floor(t), f = t - side;
+    const lo = 5, hi = 95, d = hi - lo;
+    if (side === 0) return [lo + d * f, lo];
+    if (side === 1) return [hi, lo + d * f];
+    if (side === 2) return [hi - d * f, hi];
+    return [lo, hi - d * f];
+  });
+  // Plus/cross corners (rotated 45° later to read as an X), doubled to N points
+  const crossCorners = [
+    [38,2],[62,2],[62,38],[98,38],[98,62],[62,62],
+    [62,98],[38,98],[38,62],[2,62],[2,38],[38,38]
+  ];
+  const xPts = crossCorners.flatMap(p => [p, p]);
+  const toStr = pts => pts.map(p => p[0].toFixed(2) + ',' + p[1].toFixed(2)).join(' ');
+
+  const shapeSpecs = [
+    { size: 90,  top: '15%', left: '75%' },
+    { size: 40,  top: '65%', left: '85%' },
+    { size: 60,  top: '78%', left: '12%' },
+    { size: 26,  top: '25%', left: '55%' },
+    { size: 120, top: '55%', left: '65%' }
+  ];
+  shapeSpecs.forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'shape';
+    Object.assign(el.style, { width: s.size + 'px', height: s.size + 'px', top: s.top, left: s.left });
+    el.innerHTML = '<svg viewBox="0 0 100 100"><polygon points="' + toStr(circlePts) + '"/></svg>';
+    header.appendChild(el);
+    const svg = el.querySelector('svg');
+    const poly = el.querySelector('polygon');
+
+    // Gentle drift (wrapper only, so it never fights the morph)
+    anime({
+      targets: el,
+      translateY: anime.random(-30, 30),
+      translateX: anime.random(-25, 25),
+      scale: [1, anime.random(85, 115) / 100],
+      direction: 'alternate',
+      loop: true,
+      duration: anime.random(3000, 6000),
+      easing: 'easeInOutSine'
+    });
+
+    // Bouncy morph cycle, each shape on its own rhythm
+    const bounce = 'easeOutElastic(1, ' + (anime.random(45, 75) / 100) + ')';
+    const dur = () => anime.random(1100, 1900);
+    const hold = () => anime.random(400, 1600);
+    anime.timeline({ loop: true, delay: anime.random(0, 2500) })
+      .add({ targets: poly, points: toStr(squarePts), duration: dur(), easing: bounce })
+      .add({ targets: svg, rotate: 45, duration: dur(), easing: bounce }, '+=' + hold())
+      .add({ targets: poly, points: toStr(xPts), duration: dur(), easing: bounce }, '-=' + 600)
+      .add({ targets: poly, points: toStr(circlePts), duration: dur(), easing: bounce }, '+=' + hold())
+      .add({ targets: svg, rotate: 0, duration: dur(), easing: bounce }, '-=' + 800)
+      .add({ duration: hold() }); // breather before looping
+  });
+
+  // --- Scroll-triggered reveals ---
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        anime({
+          targets: entry.target,
+          opacity: [0, 1],
+          translateY: [36, 0],
+          duration: 800,
+          delay: i * 120,
+          easing: 'easeOutExpo'
+        });
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // --- Animated stat counters (count up when scrolled into view) ---
+  const counterObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const target = parseInt(el.dataset.count, 10);
+      const prefix = el.dataset.prefix || '';
+      const suffix = el.dataset.suffix || '';
+      const state = { val: 0 };
+      anime({
+        targets: state,
+        val: target,
+        round: 1,
+        duration: 1600,
+        easing: 'easeOutExpo',
+        update: () => { el.textContent = prefix + state.val.toLocaleString() + suffix; }
+      });
+      counterObs.unobserve(el);
+    });
+  }, { threshold: 0.6 });
+  document.querySelectorAll('.num[data-count]').forEach(el => counterObs.observe(el));
+
+  // --- Skill chips pop in with stagger ---
+  const chipObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      anime({
+        targets: entry.target.querySelectorAll('.chip'),
+        opacity: [0, 1],
+        scale: [0.6, 1],
+        translateY: [12, 0],
+        duration: 700,
+        delay: anime.stagger(55),
+        easing: 'easeOutElastic(1, .7)'
+      });
+      chipObs.unobserve(entry.target);
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.chips').forEach(el => chipObs.observe(el));
+
+  // --- Playful logo hover ---
+  document.querySelector('.logo').addEventListener('mouseenter', () => {
+    anime({ targets: '.logo', scale: [1, 1.12, 1], duration: 450, easing: 'easeOutBack' });
+  });
+</script>
+</body>
+</html>
