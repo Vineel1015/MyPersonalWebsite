@@ -3,578 +3,920 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vineel Nadakuditi — Software Engineer</title>
+<title>Vineel Nadakuditi — AI Engineer</title>
+<meta name="description" content="Vineel Nadakuditi — AI engineer building agentic systems, data pipelines, and LLM tooling. Rutgers CS & Data Analytics.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --ink: #16161d;
-    --ink-soft: #55555f;
-    --bg: #fafafa;
+    --bg: #f6f7f9;
     --surface: #ffffff;
-    --accent: #4f46e5;
-    --accent-soft: #eef2ff;
-    --line: #e8e8ec;
+    --surface-2: #eef0f3;
+    --ink: #0f1419;
+    --ink-soft: #566170;
+    --ink-faint: #8a94a3;
+    --line: #dfe3e8;
+    --up: #0a9f6a;
+    --up-soft: rgba(10,159,106,.1);
+    --down: #d93b4a;
+    --amber: #b86e00;
+    --amber-soft: rgba(184,110,0,.1);
+    --grid: rgba(15,20,25,.06);
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
   }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0a0d11; --surface: #11161c; --surface-2: #171d25; --ink: #e7eaee;
+      --ink-soft: #97a1ae; --ink-faint: #5f6977; --line: #232b35;
+      --up: #22c98a; --up-soft: rgba(34,201,138,.12); --down: #f0555f;
+      --amber: #ffae2b; --amber-soft: rgba(255,174,43,.12); --grid: rgba(231,234,238,.05);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a0d11; --surface: #11161c; --surface-2: #171d25; --ink: #e7eaee;
+    --ink-soft: #97a1ae; --ink-faint: #5f6977; --line: #232b35;
+    --up: #22c98a; --up-soft: rgba(34,201,138,.12); --down: #f0555f;
+    --amber: #ffae2b; --amber-soft: rgba(255,174,43,.12); --grid: rgba(231,234,238,.05);
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; scroll-padding-top: 6.5rem; }
   body {
     font-family: 'Inter', -apple-system, sans-serif;
-    background: var(--bg);
-    color: var(--ink);
-    line-height: 1.6;
-    overflow-x: hidden;
+    background: var(--bg); color: var(--ink);
+    line-height: 1.6; overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
   }
-  ::selection { background: var(--accent); color: #fff; }
+  ::selection { background: var(--amber); color: #000; }
+  a { color: inherit; }
+  .mono { font-family: var(--mono); }
+  .up { color: var(--up); }
+  .amber { color: var(--amber); }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2.5rem); }
 
-  /* ---------- Nav ---------- */
+  /* ---------- Ticker tape ---------- */
+  .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; }
+  .tape {
+    background: #05070a; color: #cfd6de; border-bottom: 1px solid #1c232c;
+    font-family: var(--mono); font-size: .74rem; height: 30px;
+    display: flex; align-items: center; overflow: hidden; white-space: nowrap;
+  }
+  .tape-status {
+    flex: none; display: flex; align-items: center; gap: .45rem;
+    padding: 0 .9rem; height: 100%; background: #0d1117; border-right: 1px solid #1c232c;
+    color: #fff; font-weight: 700; z-index: 1;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #5f6977; }
+  .dot.open { background: #22c98a; box-shadow: 0 0 0 0 rgba(34,201,138,.6); animation: pulse 2s infinite; }
+  .dot.ext { background: #ffae2b; }
+  @keyframes pulse { 70% { box-shadow: 0 0 0 7px rgba(34,201,138,0); } 100% { box-shadow: 0 0 0 0 rgba(34,201,138,0); } }
+  .tape-track { display: flex; animation: scroll 60s linear infinite; }
+  .tape:hover .tape-track { animation-play-state: paused; }
+  .tape-item { padding: 0 1.4rem; }
+  .tape-item b { color: #fff; font-weight: 700; margin-right: .5rem; }
+  .tape-item .chg { color: #22c98a; }
+  @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
   nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 1.1rem clamp(1.5rem, 5vw, 4rem);
-    background: rgba(250,250,250,.8);
-    backdrop-filter: blur(12px);
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--line);
-    opacity: 0;
   }
-  .logo { font-weight: 800; font-size: 1.05rem; letter-spacing: -0.02em; text-decoration: none; color: var(--ink); }
-  .logo span { color: var(--accent); }
-  nav ul { display: flex; gap: 2rem; list-style: none; }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 56px; gap: 1rem; }
+  .logo {
+    font-family: var(--mono); font-weight: 700; text-decoration: none; font-size: .95rem;
+    display: flex; align-items: center; gap: .55rem; flex: none;
+  }
+  .logo .sym { background: var(--amber); color: #000; padding: .1rem .45rem; border-radius: 4px; }
+  .logo .ex { color: var(--ink-faint); font-weight: 500; font-size: .8rem; }
+  nav ul { display: flex; gap: .25rem; list-style: none; overflow-x: auto; scrollbar-width: none; }
+  nav ul::-webkit-scrollbar { display: none; }
   nav ul a {
-    text-decoration: none; color: var(--ink-soft); font-size: .9rem; font-weight: 500;
-    transition: color .2s;
+    font-family: var(--mono); font-size: .76rem; text-decoration: none; color: var(--ink-soft);
+    padding: .35rem .6rem; border-radius: 6px; white-space: nowrap; transition: background .15s, color .15s;
   }
-  nav ul a:hover { color: var(--accent); }
+  nav ul a b { color: var(--amber); font-weight: 700; margin-right: .3rem; }
+  nav ul a:hover, nav ul a.active { background: var(--surface-2); color: var(--ink); }
+  .theme-btn {
+    flex: none; background: none; border: 1px solid var(--line); color: var(--ink-soft);
+    width: 34px; height: 34px; border-radius: 8px; cursor: pointer; font-size: .95rem;
+  }
+  .theme-btn:hover { color: var(--ink); border-color: var(--ink-faint); }
 
   /* ---------- Hero ---------- */
-  header {
-    min-height: 100vh;
-    display: flex; flex-direction: column; justify-content: center;
-    padding: 0 clamp(1.5rem, 8vw, 8rem);
-    position: relative;
+  header { padding: 8.5rem 0 4rem; }
+  .hero-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: clamp(2rem, 4vw, 3.5rem); align-items: center; }
+  .kicker {
+    font-family: var(--mono); font-size: .78rem; color: var(--ink-soft);
+    display: flex; flex-wrap: wrap; gap: .4rem .9rem; margin-bottom: 1.1rem;
   }
-  .eyebrow {
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--accent); font-size: .85rem; margin-bottom: 1.2rem;
-    opacity: 0;
-  }
-  h1 {
-    font-size: clamp(2.6rem, 8vw, 5.5rem);
-    font-weight: 800; letter-spacing: -0.03em; line-height: 1.05;
-  }
-  h1 .letter { display: inline-block; opacity: 0; }
-  .tagline {
-    margin-top: 1.4rem; font-size: clamp(1.05rem, 2vw, 1.3rem);
-    color: var(--ink-soft); max-width: 34rem; opacity: 0;
-  }
-  .hero-cta { margin-top: 2.4rem; display: flex; gap: 1rem; opacity: 0; }
+  .kicker span { display: inline-flex; align-items: center; gap: .35rem; }
+  h1 { font-size: clamp(2.5rem, 6vw, 4.2rem); font-weight: 800; letter-spacing: -.035em; line-height: 1.02; }
+  h1 .last { color: var(--ink-soft); }
+  .tagline { margin-top: 1.3rem; font-size: clamp(1.02rem, 1.6vw, 1.15rem); color: var(--ink-soft); max-width: 32rem; }
+  .tagline strong { color: var(--ink); font-weight: 600; }
+  .cta { margin-top: 2rem; display: flex; flex-wrap: wrap; gap: .75rem; }
   .btn {
-    display: inline-block; text-decoration: none; font-weight: 600; font-size: .95rem;
-    padding: .8rem 1.6rem; border-radius: 10px; transition: transform .2s, box-shadow .2s;
+    display: inline-flex; align-items: center; gap: .5rem; text-decoration: none;
+    font-weight: 600; font-size: .9rem; padding: .75rem 1.3rem; border-radius: 8px;
+    transition: transform .15s, background .15s, border-color .15s; border: 1px solid transparent;
   }
-  .btn-primary { background: var(--accent); color: #fff; }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(79,70,229,.3); }
-  .btn-ghost { border: 1px solid var(--line); color: var(--ink); background: var(--surface); }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-buy { background: var(--up); color: #fff; }
+  .btn-buy:hover { background: color-mix(in srgb, var(--up) 88%, #000); }
+  .btn-ghost { border-color: var(--line); background: var(--surface); color: var(--ink); }
+  .btn-ghost:hover { border-color: var(--ink-faint); }
 
-  /* floating shapes */
-  .shape { position: absolute; pointer-events: none; opacity: .15; }
-  .shape svg { width: 100%; height: 100%; overflow: visible; }
-  .shape polygon {
-    fill: none; stroke: var(--accent); stroke-width: 2.5;
-    stroke-linejoin: round; vector-effect: non-scaling-stroke;
+  /* Quote card */
+  .quote {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    overflow: hidden; box-shadow: 0 20px 50px -30px rgba(0,0,0,.35);
   }
-  .scroll-hint {
-    position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
-    font-family: 'JetBrains Mono', monospace; font-size: .75rem; color: var(--ink-soft);
-    opacity: 0;
+  .quote-head { display: flex; justify-content: space-between; align-items: flex-start; padding: 1.1rem 1.25rem .4rem; gap: 1rem; }
+  .q-sym { font-family: var(--mono); font-weight: 700; font-size: .95rem; }
+  .q-sym span { color: var(--ink-faint); font-weight: 500; font-size: .75rem; margin-left: .4rem; }
+  .q-name { font-size: .78rem; color: var(--ink-soft); }
+  .q-price { text-align: right; }
+  .q-price .big { font-family: var(--mono); font-size: 1.9rem; font-weight: 700; line-height: 1.1; letter-spacing: -.02em; }
+  .q-price .chg { font-family: var(--mono); font-size: .8rem; color: var(--up); }
+  .ranges { display: flex; gap: .2rem; padding: 0 1.25rem; }
+  .ranges button {
+    font-family: var(--mono); font-size: .7rem; background: none; border: none; color: var(--ink-faint);
+    padding: .25rem .5rem; border-radius: 5px; cursor: pointer;
   }
+  .ranges button.on { background: var(--surface-2); color: var(--ink); }
+  .ranges .asof { margin-left: auto; align-self: center; font-family: var(--mono); font-size: .66rem; color: var(--ink-faint); }
+  .chart { position: relative; padding: .5rem .5rem 0; }
+  .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .chart .gridline { stroke: var(--grid); }
+  .chart .axis { fill: var(--ink-faint); font-family: var(--mono); font-size: 10px; }
+  .chart .line { fill: none; stroke: var(--up); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .chart .proj { fill: none; stroke: var(--up); stroke-width: 1.5; stroke-dasharray: 3 4; opacity: .6; }
+  .chart .vol { fill: var(--up); opacity: .45; }
+  .chart .vol.hot { opacity: 1; }
+  .chart .ev line { stroke: var(--amber); stroke-dasharray: 2 3; opacity: .7; }
+  .chart .ev path { fill: var(--amber); }
+  .chart .ev text { fill: var(--amber); }
+  .chart .xhair { stroke: var(--ink-faint); stroke-dasharray: 2 3; }
+  .tip {
+    position: absolute; pointer-events: none; background: var(--ink); color: var(--bg);
+    font-family: var(--mono); font-size: .7rem; padding: .4rem .55rem; border-radius: 6px;
+    white-space: nowrap; opacity: 0; transition: opacity .12s; transform: translate(-50%, -115%);
+  }
+  .tip b { display: block; font-size: .72rem; }
+  .q-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line);
+    font-family: var(--mono); font-size: .72rem;
+  }
+  .q-stats div { padding: .7rem 1.25rem; border-right: 1px solid var(--line); }
+  .q-stats div:last-child { border-right: none; }
+  .q-stats dt { color: var(--ink-faint); }
+  .q-stats dd { font-weight: 700; margin-top: .1rem; }
 
   /* ---------- Sections ---------- */
-  section { padding: clamp(4rem, 10vw, 7rem) clamp(1.5rem, 8vw, 8rem); }
-  .section-label {
-    font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: var(--accent);
-    margin-bottom: .6rem;
+  section { padding: clamp(3.5rem, 8vw, 5.5rem) 0; border-top: 1px solid var(--line); }
+  .sec-head { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2.2rem; flex-wrap: wrap; }
+  .fn {
+    font-family: var(--mono); font-size: .75rem; font-weight: 700; color: #000;
+    background: var(--amber); padding: .2rem .5rem; border-radius: 4px; letter-spacing: .04em;
   }
-  h2 {
-    font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -0.02em;
-    margin-bottom: 2rem;
-  }
-  .reveal { opacity: 0; }
+  .fn-go { font-family: var(--mono); font-size: .75rem; color: var(--ink-faint); }
+  h2 { font-size: clamp(1.6rem, 3.4vw, 2.2rem); font-weight: 800; letter-spacing: -.025em; width: 100%; margin-top: .3rem; }
+  .sub { color: var(--ink-soft); max-width: 40rem; margin-top: -1.2rem; margin-bottom: 2rem; }
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity: 1; transform: none; }
 
   /* About */
-  .about-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 3rem; align-items: start; }
-  .about-grid p { color: var(--ink-soft); margin-bottom: 1rem; max-width: 40rem; }
-  .fact-card {
-    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
-    padding: 1.5rem;
+  .des-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 2.5rem; align-items: start; }
+  .des-grid p { color: var(--ink-soft); margin-bottom: 1rem; max-width: 40rem; }
+  .des-grid p strong { color: var(--ink); font-weight: 600; }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .panel-title {
+    font-family: var(--mono); font-size: .72rem; color: var(--ink-faint); padding: .7rem 1.1rem;
+    border-bottom: 1px solid var(--line); background: var(--surface-2); display: flex; justify-content: space-between;
   }
-  .fact-card ul { list-style: none; }
-  .fact-card li {
-    display: flex; justify-content: space-between; padding: .6rem 0;
-    border-bottom: 1px solid var(--line); font-size: .9rem;
-  }
-  .fact-card li:last-child { border-bottom: none; }
-  .fact-card li span:first-child { color: var(--ink-soft); }
-  .fact-card li span:last-child { font-weight: 600; }
+  .kv { list-style: none; font-size: .88rem; }
+  .kv li { display: flex; justify-content: space-between; gap: 1rem; padding: .65rem 1.1rem; border-bottom: 1px solid var(--line); }
+  .kv li:last-child { border-bottom: none; }
+  .kv li span:first-child { color: var(--ink-soft); font-family: var(--mono); font-size: .78rem; }
+  .kv li span:last-child { font-weight: 600; text-align: right; }
 
-  /* Projects */
-  #projects { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-  .projects-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 1.5rem;
+  /* Experience = earnings */
+  .er { display: grid; grid-template-columns: 220px 1fr; gap: 2rem; padding: 2rem 0; border-bottom: 1px dashed var(--line); }
+  .er:last-child { border-bottom: none; }
+  .er-meta .co { font-weight: 700; font-size: 1.05rem; letter-spacing: -.01em; }
+  .er-meta .sym { font-family: var(--mono); font-size: .72rem; color: var(--amber); font-weight: 700; }
+  .er-meta .dt, .er-meta .loc { font-family: var(--mono); font-size: .74rem; color: var(--ink-faint); }
+  .er-meta .dt { margin-top: .6rem; }
+  .er h3 { font-size: 1.2rem; letter-spacing: -.015em; margin-bottom: .9rem; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .7rem; margin-bottom: 1.2rem; }
+  .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: .85rem 1rem; }
+  .kpi .v { font-family: var(--mono); font-size: 1.45rem; font-weight: 700; color: var(--up); letter-spacing: -.02em; line-height: 1.15; }
+  .kpi .v .arr { font-size: .8rem; margin-right: .2rem; }
+  .kpi .l { font-size: .74rem; color: var(--ink-soft); line-height: 1.35; margin-top: .2rem; }
+  .er ul { list-style: none; }
+  .er li { position: relative; padding-left: 1.2rem; color: var(--ink-soft); font-size: .93rem; margin-bottom: .5rem; }
+  .er li::before { content: '▸'; position: absolute; left: 0; color: var(--amber); }
+
+  /* Projects = portfolio */
+  .filters { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1.5rem; }
+  .filters button {
+    font-family: var(--mono); font-size: .75rem; background: var(--surface); color: var(--ink-soft);
+    border: 1px solid var(--line); padding: .4rem .8rem; border-radius: 99px; cursor: pointer;
   }
-  .card {
-    background: var(--bg); border: 1px solid var(--line); border-radius: 16px;
-    padding: 1.8rem; position: relative; overflow: hidden;
-    transition: transform .25s, box-shadow .25s, border-color .25s;
-    display: flex; flex-direction: column;
-    text-decoration: none; color: inherit;
+  .filters button.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .port { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+  .pos {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem;
+    display: flex; flex-direction: column; transition: border-color .2s, transform .2s;
   }
-  .card-link {
-    font-family: 'JetBrains Mono', monospace; font-size: .78rem;
-    color: var(--accent); margin-top: 1rem; font-weight: 500;
+  .pos:hover { border-color: var(--ink-faint); transform: translateY(-3px); }
+  .pos.hidden { display: none; }
+  .pos.feature { grid-column: 1 / -1; display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.5rem; }
+  .pos-top { display: flex; justify-content: space-between; align-items: center; gap: .6rem; margin-bottom: .7rem; }
+  .pos-sym { font-family: var(--mono); font-weight: 700; font-size: .82rem; display: flex; gap: .5rem; align-items: center; }
+  .badge {
+    font-family: var(--mono); font-size: .64rem; font-weight: 700; padding: .12rem .45rem; border-radius: 4px;
+    background: var(--amber-soft); color: var(--amber); letter-spacing: .03em;
   }
-  .card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(22,22,29,.08); border-color: var(--accent); }
-  .card-num {
-    font-family: 'JetBrains Mono', monospace; font-size: .75rem; color: var(--accent);
-    background: var(--accent-soft); padding: .25rem .6rem; border-radius: 6px;
-    align-self: flex-start; margin-bottom: 1rem;
-  }
-  .card h3 { font-size: 1.2rem; margin-bottom: .5rem; letter-spacing: -0.01em; }
-  .card p { color: var(--ink-soft); font-size: .92rem; flex: 1; }
-  .tags { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: 1.2rem; }
+  .badge.g { background: var(--up-soft); color: var(--up); }
+  .spark { display: flex; align-items: center; gap: .5rem; flex: none; font-family: var(--mono); font-size: .68rem; color: var(--ink-faint); }
+  .spark svg { width: 78px; height: 22px; }
+  .spark rect { fill: var(--up); }
+  .spark .base { fill: var(--line); }
+  .pos h3 { font-size: 1.08rem; letter-spacing: -.01em; margin-bottom: .4rem; }
+  .pos p { color: var(--ink-soft); font-size: .9rem; flex: 1; }
+  .tags { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: 1rem; }
   .tags span {
-    font-family: 'JetBrains Mono', monospace; font-size: .7rem; color: var(--ink-soft);
-    border: 1px solid var(--line); padding: .2rem .55rem; border-radius: 99px;
+    font-family: var(--mono); font-size: .68rem; color: var(--ink-soft);
+    background: var(--surface-2); padding: .18rem .5rem; border-radius: 4px;
   }
+  .pos-link { font-family: var(--mono); font-size: .76rem; margin-top: 1rem; color: var(--up); text-decoration: none; font-weight: 500; }
+  .pos-link:hover { text-decoration: underline; }
+  .flow { font-family: var(--mono); font-size: .74rem; display: flex; flex-direction: column; gap: .45rem; justify-content: center; }
+  .flow div {
+    border: 1px solid var(--line); border-radius: 8px; padding: .55rem .75rem; background: var(--surface-2);
+    display: flex; justify-content: space-between; gap: .8rem;
+  }
+  .flow div span:last-child { color: var(--ink-faint); text-align: right; }
+  .flow div.hitl { border-color: var(--amber); background: var(--amber-soft); }
+  .flow div.hitl span:first-child { color: var(--amber); font-weight: 700; }
+  .flow .arrow { border: none; background: none; padding: 0; justify-content: center; color: var(--ink-faint); line-height: 1; }
 
-  /* Experience */
-  .xp {
-    position: relative; padding: 0 0 2.8rem 2.4rem;
-    border-left: 2px solid var(--line); max-width: 46rem;
+  /* Skills = allocation */
+  .alloc-bar { display: flex; height: 14px; border-radius: 4px; overflow: hidden; margin-bottom: .8rem; gap: 2px; }
+  .alloc-bar div { width: 0; transition: width 1.1s cubic-bezier(.2,.8,.2,1); }
+  .alloc-legend { display: flex; flex-wrap: wrap; gap: .4rem 1.2rem; font-family: var(--mono); font-size: .74rem; color: var(--ink-soft); margin-bottom: 2rem; }
+  .alloc-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: .4rem; }
+  .sectors { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+  .sector h4 {
+    font-family: var(--mono); font-size: .76rem; font-weight: 700; padding: .7rem 1rem;
+    border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center;
   }
-  .xp:last-of-type { padding-bottom: .5rem; }
-  .xp::before {
-    content: ''; position: absolute; left: -8px; top: 4px;
-    width: 14px; height: 14px; border-radius: 50%;
-    background: var(--accent); border: 3px solid var(--bg);
-    box-shadow: 0 0 0 2px var(--accent);
-  }
-  .xp-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: .3rem; }
-  .xp-head h3 { font-size: 1.25rem; letter-spacing: -0.01em; }
-  .xp-head h3 span { color: var(--accent); }
-  .xp-date { font-family: 'JetBrains Mono', monospace; font-size: .78rem; color: var(--ink-soft); }
-  .xp-co { color: var(--ink-soft); font-size: .92rem; margin: .15rem 0 .8rem; font-weight: 500; }
-  .xp p.blurb { color: var(--ink-soft); font-size: .95rem; max-width: 42rem; }
-  .stats { display: flex; flex-wrap: wrap; gap: 1.2rem 2.5rem; margin-top: 1.3rem; }
-  .stat .num {
-    font-size: 2rem; font-weight: 800; color: var(--accent);
-    letter-spacing: -0.02em; line-height: 1.1; display: block;
-  }
-  .stat .lbl {
-    font-family: 'JetBrains Mono', monospace; font-size: .72rem;
-    color: var(--ink-soft); display: block; max-width: 11rem;
-  }
+  .sector h4 span:last-child { color: var(--ink-faint); font-weight: 500; }
+  .sector .chips { display: flex; flex-wrap: wrap; gap: .4rem; padding: 1rem; }
+  .chip { font-size: .8rem; font-weight: 500; border: 1px solid var(--line); padding: .3rem .7rem; border-radius: 99px; }
 
-  /* Skills */
-  #skills { background: var(--surface); border-top: 1px solid var(--line); }
-  .skill-group { margin-bottom: 2.2rem; }
-  .skill-group h4 {
-    font-family: 'JetBrains Mono', monospace; font-size: .8rem;
-    color: var(--ink-soft); font-weight: 500; margin-bottom: .9rem;
-  }
-  .chips { display: flex; flex-wrap: wrap; gap: .6rem; }
-  .chip {
-    font-size: .85rem; font-weight: 500; color: var(--ink-soft);
-    border: 1px solid var(--line); background: var(--bg);
-    padding: .45rem 1rem; border-radius: 99px; opacity: 0;
-    transition: transform .2s, border-color .2s, color .2s;
-  }
-  .chip:hover { transform: translateY(-3px) rotate(-1deg); border-color: var(--accent); color: var(--accent); }
-  .chip-hot {
-    background: var(--accent-soft); border-color: var(--accent);
-    color: var(--accent); font-weight: 600; font-size: .95rem;
-    padding: .6rem 1.25rem;
-  }
-  .chip-hot:hover { background: var(--accent); color: #fff; }
-  .skills-note { color: var(--ink-soft); font-size: .9rem; max-width: 38rem; margin-bottom: 2rem; }
+  /* Fundamentals */
+  .fund-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; }
+  .fund-num { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); }
+  .fund-num div { padding: 1.1rem; border-right: 1px solid var(--line); }
+  .fund-num div:last-child { border-right: none; }
+  .fund-num .v { font-family: var(--mono); font-size: 1.5rem; font-weight: 700; }
+  .fund-num .l { font-size: .74rem; color: var(--ink-soft); }
+  .course { padding: 1rem 1.1rem; display: flex; flex-wrap: wrap; gap: .4rem; }
+  .interests { padding: 1rem 1.1rem; display: flex; flex-wrap: wrap; gap: .4rem; }
 
-  /* Contact */
-  #contact { text-align: center; }
-  #contact p { color: var(--ink-soft); max-width: 30rem; margin: 0 auto 2rem; }
-  .socials { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; }
-  .socials a {
-    font-family: 'JetBrains Mono', monospace; font-size: .85rem;
-    color: var(--ink-soft); text-decoration: none; padding: .5rem 1rem;
-    border: 1px solid var(--line); border-radius: 99px; transition: all .2s;
+  /* Contact = order ticket */
+  .ticket { max-width: 560px; margin: 0 auto; }
+  .ticket-side { display: grid; grid-template-columns: 1fr 1fr; }
+  .ticket-side span {
+    text-align: center; font-family: var(--mono); font-weight: 700; font-size: .8rem; padding: .7rem;
+    border-bottom: 1px solid var(--line); color: var(--ink-faint);
   }
-  .socials a:hover { color: var(--accent); border-color: var(--accent); transform: translateY(-2px); }
+  .ticket-side span.on { color: var(--up); border-bottom: 2px solid var(--up); background: var(--up-soft); }
+  .ticket .kv li span:last-child { font-family: var(--mono); font-size: .82rem; }
+  .ticket-actions { padding: 1.1rem; display: grid; gap: .6rem; }
+  .ticket-actions .btn { justify-content: center; }
+  .ticket-links { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; }
+  .fine { font-family: var(--mono); font-size: .68rem; color: var(--ink-faint); text-align: center; margin-top: 1.2rem; }
 
-  footer {
-    text-align: center; padding: 2rem; font-size: .8rem; color: var(--ink-soft);
-    border-top: 1px solid var(--line);
+  footer { border-top: 1px solid var(--line); padding: 2rem 0; font-family: var(--mono); font-size: .72rem; color: var(--ink-faint); }
+  footer .wrap { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+
+  @media (max-width: 900px) {
+    .hero-grid, .des-grid, .fund-grid { grid-template-columns: 1fr; }
+    .pos.feature { grid-template-columns: 1fr; }
+    .er { grid-template-columns: 1fr; gap: .8rem; }
+    header { padding-top: 7.5rem; }
   }
-
-  @media (max-width: 720px) {
-    .about-grid { grid-template-columns: 1fr; }
-    nav ul { gap: 1.1rem; }
+  @media (max-width: 560px) {
+    .logo .ex { display: none; }
+    .q-stats { grid-template-columns: repeat(2, 1fr); }
+    .q-stats div:nth-child(2) { border-right: none; }
+    .q-stats div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+    .port { grid-template-columns: 1fr; }
+    .fund-num { grid-template-columns: 1fr 1fr 1fr; }
+    .fund-num div { padding: .9rem .7rem; }
+    .fund-num .v { font-size: 1.2rem; }
+    .ticket-links { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tape-track { animation: none; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
   }
 </style>
 </head>
 <body>
 
-<nav id="navbar">
-  <a class="logo" href="#top">vineel<span>.</span></a>
-  <ul>
-    <li><a href="#about">About</a></li>
-    <li><a href="#experience">Experience</a></li>
-    <li><a href="#skills">Skills</a></li>
-    <li><a href="#projects">Projects</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-</nav>
+<div class="topbar">
+  <div class="tape" aria-label="Career highlights ticker">
+    <div class="tape-status"><span class="dot" id="mkt-dot"></span><span id="mkt-label">NYSE</span><span id="mkt-time" style="color:#8b95a3;font-weight:400"></span></div>
+    <div class="tape-track" id="tape"></div>
+  </div>
+  <nav>
+    <div class="wrap">
+      <a class="logo" href="#top"><span class="sym">VNDK</span><span class="ex">Vineel Nadakuditi</span></a>
+      <ul id="navlinks">
+        <li><a href="#about"><b>DES</b>About</a></li>
+        <li><a href="#experience"><b>EARN</b>Experience</a></li>
+        <li><a href="#projects"><b>PORT</b>Projects</a></li>
+        <li><a href="#skills"><b>ALLOC</b>Skills</a></li>
+        <li><a href="#fundamentals"><b>FA</b>Education</a></li>
+        <li><a href="#contact"><b>MSG</b>Contact</a></li>
+      </ul>
+      <button class="theme-btn" id="theme" aria-label="Toggle color theme">◐</button>
+    </div>
+  </nav>
+</div>
 
 <header id="top">
-  <p class="eyebrow">// hello, world</p>
-  <h1 id="hero-name">Vineel Nadakuditi</h1>
-  <p class="tagline">I build AI-powered applications — leveraging agentic workflows, robust data pipelines, and automation that saves teams real hours. Currently shipping AI tooling at Bristol Myers Squibb.</p>
-  <div class="hero-cta">
-    <a class="btn btn-primary" href="#projects">See my work</a>
-    <a class="btn btn-ghost" href="#contact">Get in touch</a>
+  <div class="wrap hero-grid">
+    <div>
+      <div class="kicker">
+        <span><span class="dot open"></span>AI Engineer</span>
+        <span>New York</span>
+        <span>Rutgers '26</span>
+      </div>
+      <h1>Vineel<br><span class="last">Nadakuditi</span></h1>
+      <p class="tagline">I build <strong>AI agents and data pipelines</strong> for places where mistakes get noticed. At Bristol Myers Squibb I shipped a generative AI review system that <strong>cut FTE hours by 85%</strong> and saves <strong>$500K per review</strong>. On my own time I build agents that read 10-Ks.</p>
+      <div class="cta">
+        <a class="btn btn-buy" href="#contact">Get in touch</a>
+        <a class="btn btn-ghost" href="#projects">View projects</a>
+        <a class="btn btn-ghost" href="resume.pdf" target="_blank" rel="noopener">Résumé ↗</a>
+      </div>
+    </div>
+
+    <div class="quote" aria-label="GitHub commit chart">
+      <div class="quote-head">
+        <div>
+          <div class="q-sym">VNDK <span>GITHUB: COMMITS</span></div>
+          <div class="q-name">Cumulative commits · public repos</div>
+        </div>
+        <div class="q-price">
+          <div class="big" id="q-big">—</div>
+          <div class="chg" id="q-chg"></div>
+        </div>
+      </div>
+      <div class="ranges" id="ranges">
+        <button data-r="13">3M</button>
+        <button data-r="52">1Y</button>
+        <button data-r="0" class="on">ALL</button>
+        <span class="asof" id="q-asof"></span>
+      </div>
+      <div class="chart" id="chart">
+        <svg id="chart-svg" viewBox="0 0 600 260" role="img" aria-label="Cumulative GitHub commits over time, with weekly commit volume"></svg>
+        <div class="tip" id="tip"></div>
+      </div>
+      <dl class="q-stats">
+        <div><dt>COMMITS</dt><dd class="up" id="s-total">—</dd></div>
+        <div><dt>REPOS</dt><dd id="s-repos">—</dd></div>
+        <div><dt>ACTIVE WEEKS</dt><dd id="s-weeks">—</dd></div>
+        <div><dt>LAST COMMIT</dt><dd id="s-last">—</dd></div>
+      </dl>
+    </div>
   </div>
-  <p class="scroll-hint">scroll ↓</p>
 </header>
 
+<main>
 <section id="about">
-  <div class="reveal">
-    <p class="section-label">01 / about</p>
-    <h2>A bit about me</h2>
-  </div>
-  <div class="about-grid">
-    <div class="reveal">
-      <p>I was a computer science and data analytics student at Rutgers who shipped production software. My sweet spot is the new AI paradigm: agentic workflows, MCP, RAG, and human-in-the-loop systems that turn thousands of hours of manual work into minutes.</p>
-      <p>Right now I'm at Bristol Myers Squibb leading development on an AI-powered periodic review tool that cut review effort by 80%. Before that, I taught 800 students as Head TA and built data tooling for a Newark nonprofit.</p>
-      <p></p>
-    </div>
-    <div class="fact-card reveal">
-      <ul>
-        <li><span>Currently</span><span>AI Product Delivery @ BMS</span></li>
-        <li><span>Education</span><span>Rutgers BAIT '26</span></li>
-        <li><span>Certified</span><span>AWS Cloud Practitioner</span></li>
-        <li><span>Based in</span><span>New York</span></li>
-      </ul>
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="fn">DES</span><span class="fn-go">&lt;GO&gt; company description</span><h2>About me</h2></div>
+    <div class="des-grid">
+      <div class="reveal">
+        <p>I'm finishing a <strong>B.S. in Computer Science and Data Analytics at Rutgers</strong> (4.0 GPA, graduating December 2026). Most of what I build is <strong>generative AI that has to be trustworthy</strong>: agent pipelines that pull structured data out of messy documents, evaluation frameworks that grade LLM output, and human-in-the-loop checkpoints so that a person signs off on the calls that matter.</p>
+        <p>This summer I built exactly that at <strong>Bristol Myers Squibb</strong>, automating periodic reviews of validated systems in a regulated environment. Before that I was Head TA for 800+ Rutgers students, explaining data pipelines and databases to people who had never written a query.</p>
+        <p>Outside of work I follow <strong>the markets</strong>. Financial filings are one of my favorite test cases for AI: a lot of text, real consequences, and an unforgiving audience. That's why my most recent agent reads 10-Ks and 10-Qs.</p>
+      </div>
+      <div class="panel reveal">
+        <div class="panel-title"><span>PROFILE</span><span>VNDK US</span></div>
+        <ul class="kv">
+          <li><span>Sector</span><span>AI / Data Engineering</span></li>
+          <li><span>Latest role</span><span>AI Engineering Intern, BMS</span></li>
+          <li><span>Education</span><span>Rutgers · CS &amp; Data Analytics</span></li>
+          <li><span>Graduating</span><span>December 2026</span></li>
+          <li><span>HQ</span><span>New York</span></li>
+          <li><span>Focus</span><span>Agents · Pipelines · Governance</span></li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
 
 <section id="experience">
-  <div class="reveal">
-    <p class="section-label">02 / experience</p>
-    <h2>Where I've made an impact</h2>
-  </div>
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="fn">EARN</span><span class="fn-go">&lt;GO&gt; earnings history</span><h2>Experience</h2></div>
 
-  <div class="xp reveal">
-    <div class="xp-head">
-      <h3>AI Product Delivery Intern <span>→</span></h3>
-      <span class="xp-date">May 2026 — Present</span>
-    </div>
-    <p class="xp-co">Bristol Myers Squibb · Newark, NJ</p>
-    <p class="blurb">Leading development of the Periodic Review Automation tool — an AI document-aggregation system with a human-in-the-loop analyzer chatbot that scores 1000s of documents with confidence levels, so reviewers focus judgment where it matters. Backed by a 150+ case test suite that kept 50+ PR changes shipping with zero significant downtime.</p>
-    <div class="stats">
-      <div class="stat"><span class="num" data-count="80" data-suffix="%">0</span><span class="lbl">less effort per review</span></div>
-      <div class="stat"><span class="num" data-count="70" data-suffix="%">0</span><span class="lbl">fewer missed reviews company-wide</span></div>
-      <div class="stat"><span class="num" data-count="85" data-suffix="%">0</span><span class="lbl">automated test coverage</span></div>
-    </div>
-  </div>
+    <article class="er reveal">
+      <div class="er-meta">
+        <div class="sym">BMY · Q2–Q3 2026</div>
+        <div class="co">Bristol Myers Squibb</div>
+        <div class="dt">May 2026 — Sep 2026</div>
+        <div class="loc">Princeton, NJ</div>
+      </div>
+      <div>
+        <h3>AI Engineering Intern</h3>
+        <div class="kpis">
+          <div class="kpi"><div class="v"><span class="arr">▼</span><span data-count="85" data-suffix="%">0</span></div><div class="l">FTE hours per periodic review</div></div>
+          <div class="kpi"><div class="v"><span data-count="500" data-prefix="$" data-suffix="K">0</span></div><div class="l">saved per review cycle</div></div>
+          <div class="kpi"><div class="v"><span data-count="90" data-suffix="+">0</span></div><div class="l">cross-system data defects resolved</div></div>
+          <div class="kpi"><div class="v"><span class="arr">▲</span><span data-count="25" data-suffix="%">0</span></div><div class="l">read/write throughput</div></div>
+        </div>
+        <ul>
+          <li>Designed, built, and deployed a generative AI system that automates periodic reviews of validated systems for 20 ITVS users in a regulated (GxP) environment.</li>
+          <li>Built pipelines that reconcile ServiceNow CMDB, DocIT, and the Infinity data lake, fixing 90+ inconsistencies between systems of record.</li>
+          <li>Designed an evaluation framework that scores 20 output types from Anthropic and OpenAI models, using LLM-as-a-judge as a control on reliability.</li>
+          <li>Turned business workflows into requirements with 6 subject-matter experts. The validation cycles led to 15+ changes and a measured 20% gain in impact.</li>
+        </ul>
+      </div>
+    </article>
 
-  <div class="xp reveal">
-    <div class="xp-head">
-      <h3>Head Teaching Assistant <span>→</span></h3>
-      <span class="xp-date">Jan 2025 — May 2026</span>
-    </div>
-    <p class="xp-co">Rutgers Computer Science Department · New Brunswick, NJ</p>
-    <p class="blurb">Led 800+ students as head teaching assistant, teaching non-technical users strong foundational concepts in frontend development, database administration, design logic, error handling, and basic data pipelines</p>
-    <div class="stats">
-      <div class="stat"><span class="num" data-count="800" data-suffix="">0</span><span class="lbl">students taught weekly</span></div>
-      <div class="stat"><span class="num" data-count="90" data-suffix="%">0</span><span class="lbl">faster time-to-help via forum</span></div>
-      <div class="stat"><span class="num" data-count="5000" data-suffix="+">0</span><span class="lbl">forum responses generated</span></div>
-    </div>
+    <article class="er reveal">
+      <div class="er-meta">
+        <div class="sym">RU-CS · FY25–FY26</div>
+        <div class="co">Rutgers Computer Science</div>
+        <div class="dt">Jan 2025 — May 2026</div>
+        <div class="loc">New Brunswick, NJ</div>
+      </div>
+      <div>
+        <h3>Head Teaching Assistant</h3>
+        <div class="kpis">
+          <div class="kpi"><div class="v"><span data-count="800" data-suffix="+">0</span></div><div class="l">students led</div></div>
+          <div class="kpi"><div class="v"><span data-count="300" data-suffix="+">0</span></div><div class="l">student responses analyzed with AI</div></div>
+          <div class="kpi"><div class="v"><span data-count="120" data-suffix="+">0</span></div><div class="l">students at project demos</div></div>
+        </div>
+        <ul>
+          <li>Taught data pipelines, database administration, design logic, and error handling to non-technical students.</li>
+          <li>Ran sentiment analysis and categorization on 300+ student responses to find curriculum pain points, then built an AI chatbot for Professor Lau that addresses the top issues.</li>
+          <li>Gave 8 project demos covering deliverables, baseline expectations, and environment setup, and held office hours every other week.</li>
+        </ul>
+      </div>
+    </article>
   </div>
+</section>
 
-  <div class="xp reveal">
-    <div class="xp-head">
-      <h3>Data Analyst Intern <span>→</span></h3>
-      <span class="xp-date">May 2023 — Sep 2024</span>
+<section id="projects">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="fn">PORT</span><span class="fn-go">&lt;GO&gt; portfolio holdings</span><h2>Projects</h2></div>
+    <div class="filters reveal" id="filters">
+      <button class="on" data-f="all">All</button>
+      <button data-f="agents">AI agents</button>
+      <button data-f="data">Data &amp; ML</button>
+      <button data-f="finance">Finance</button>
     </div>
-    <p class="xp-co">Project Innovate Newark · Newark, NJ</p>
-    <p class="blurb">Drove $20000+ in contract acquisitions from businesses, marketing computer science and business foundations curriculum for students and conducted discovery and feasibility study on 5 different sites from interested clients.</p>
-    <div class="stats">
-      <div class="stat"><span class="num" data-count="50" data-prefix="$" data-suffix="K+">0</span><span class="lbl">account visibility unlocked</span></div>
-      <div class="stat"><span class="num" data-count="30" data-suffix="%">0</span><span class="lbl">time saved via automation</span></div>
+    <div class="port">
+
+      <article class="pos feature reveal" data-cat="agents finance">
+        <div style="display:flex;flex-direction:column">
+          <div class="pos-top">
+            <div class="pos-sym">DOCR <span class="badge">TOP HOLDING</span> <span class="badge g">FINANCE</span></div>
+            <div class="spark" data-repo="Autonomous-Document-Review-Agent"></div>
+          </div>
+          <h3>Autonomous Document Review Agent</h3>
+          <p>An agent for investment due diligence. It ingests 10-K and 10-Q filings, extracts financials and risk findings into a structured schema, and flags anomalies based only on the filing's internal consistency, never on what the model remembers about the company. It pauses for human approval before anything consequential is treated as final, and logs every decision in an audit trail. A cross-check layer caught a unit-mislabeling defect that prompt engineering alone couldn't fix, and it blocked a flawed fix before that fix corrupted any data.</p>
+          <div class="tags"><span>Python</span><span>TypeScript</span><span>LangGraph</span><span>FastAPI</span><span>PostgreSQL</span><span>pgvector</span><span>AWS</span></div>
+          <a class="pos-link" href="https://github.com/Vineel1015/Autonomous-Document-Review-Agent" target="_blank" rel="noopener">view code ↗</a>
+        </div>
+        <div class="flow" aria-label="Pipeline diagram">
+          <div><span>10-K / 10-Q</span><span>ingest</span></div>
+          <div class="arrow">↓</div>
+          <div><span>Concurrent LLM extraction</span><span>schema-bound</span></div>
+          <div class="arrow">↓</div>
+          <div><span>Numbers · Findings</span><span>value · unit · period</span></div>
+          <div class="arrow">↓</div>
+          <div><span>Anomaly + unit cross-check</span><span>data-quality gate</span></div>
+          <div class="arrow">↓</div>
+          <div class="hitl"><span>Human approval</span><span>consequential calls</span></div>
+          <div class="arrow">↓</div>
+          <div><span>Audit trail</span><span>Postgres checkpoints</span></div>
+        </div>
+      </article>
+
+      <article class="pos reveal" data-cat="agents">
+        <div class="pos-top"><div class="pos-sym">MCPS <span class="badge">OPEN SOURCE</span></div></div>
+        <h3>Enterprise MCP Server</h3>
+        <p>Open-source MCP server that exposes enterprise ticketing and CMDB systems to LLM agents as governed, callable tools. It handles OAuth and service-account auth, rate limiting, retry with backoff, and structured errors, and ships with an integration test suite and a written spec.</p>
+        <div class="tags"><span>Python</span><span>TypeScript</span><span>MCP SDKs</span><span>OAuth 2.0</span><span>pytest</span></div>
+      </article>
+
+      <article class="pos reveal" data-cat="data finance">
+        <div class="pos-top"><div class="pos-sym">STRM <span class="badge g">MARKETS</span></div></div>
+        <h3>Real-Time Stock Market Pipeline</h3>
+        <p>Streaming pipeline with Kafka producers, brokers, and consumers feeding AWS. Tuning the partitions made retrieval 50% faster, and a cleaning and decomposition stage prepares the data for time-series analysis.</p>
+        <div class="tags"><span>Kafka</span><span>AWS Glue</span><span>Athena</span><span>S3</span><span>EC2</span></div>
+      </article>
+
+      <article class="pos reveal" data-cat="agents">
+        <div class="pos-top"><div class="pos-sym">FBOT</div><div class="spark" data-repo="Fantasy-bot"></div></div>
+        <h3>Fantasy Football Bot</h3>
+        <p>Portfolio optimization for Sleeper leagues. It builds the optimal lineup under your league's scoring, suggests waiver adds that raise projected points, and uses Claude to classify NFL news by impact. Includes a watch mode with Discord alerts and a chatbot that answers like a league-mate.</p>
+        <div class="tags"><span>Python</span><span>Claude API</span><span>Sleeper API</span><span>RSS</span></div>
+        <a class="pos-link" href="https://github.com/Vineel1015/Fantasy-bot" target="_blank" rel="noopener">view code ↗</a>
+      </article>
+
+      <article class="pos reveal" data-cat="agents">
+        <div class="pos-top"><div class="pos-sym">INSB</div><div class="spark" data-repo="Insurance-Bot"></div></div>
+        <h3>Insurance Denial Appeal Helper</h3>
+        <p>Takes a health-insurance denial letter and produces a drafted appeal, a checklist of what to attach, and a deadline reminder by email or SMS. It's scoped tightly to one problem: denial letters from commercial plans.</p>
+        <div class="tags"><span>Python</span><span>Flask</span><span>Claude API</span><span>Twilio</span></div>
+        <a class="pos-link" href="https://github.com/Vineel1015/Insurance-Bot" target="_blank" rel="noopener">view code ↗</a>
+      </article>
+
+      <article class="pos reveal" data-cat="data">
+        <div class="pos-top"><div class="pos-sym">KICN <span class="badge g">1ST PLACE</span></div></div>
+        <h3>Rutgers HealthHack Winner</h3>
+        <p>Led ML development for a health-tracking app, backed by 6 expert interviews and journey mapping with 10+ heavy users. A RAG pipeline over 5,000+ rows of time-series data returns recommendations in plain language. Won 1st place and $3,000.</p>
+        <div class="tags"><span>PyTorch</span><span>Pandas</span><span>Swift</span><span>Firebase</span><span>React</span></div>
+        <a class="pos-link" href="https://www.youtube.com/watch?v=j6ofxc26VMc" target="_blank" rel="noopener">watch demo ↗</a>
+      </article>
+
+      <article class="pos reveal" data-cat="data">
+        <div class="pos-top"><div class="pos-sym">PRMR</div><div class="spark" data-repo="Primer"></div></div>
+        <h3>Primer: Adaptive Reading Tutor</h3>
+        <p>A reading tutor for ages 4–7, built on a skill graph of phonics prerequisites. A decodability verifier aligns each word's letters to its pronunciation, so it only shows children words they've been taught to read.</p>
+        <div class="tags"><span>TypeScript</span><span>Zod</span><span>Graph algorithms</span></div>
+        <a class="pos-link" href="https://github.com/Vineel1015/Primer" target="_blank" rel="noopener">view code ↗</a>
+      </article>
+
+      <article class="pos reveal" data-cat="data">
+        <div class="pos-top"><div class="pos-sym">YTDA</div><div class="spark" data-repo="Data-Migration-Project"></div></div>
+        <h3>YouTube Channel Analytics</h3>
+        <p>Pulls channel and video stats through the YouTube Data v3 API, then cleans and structures them into an adjustable report on viewership and engagement trends.</p>
+        <div class="tags"><span>Python</span><span>Pandas</span><span>Seaborn</span><span>YouTube API</span></div>
+        <a class="pos-link" href="https://github.com/Vineel1015/Data-Migration-Project" target="_blank" rel="noopener">view code ↗</a>
+      </article>
+
     </div>
   </div>
 </section>
 
 <section id="skills">
-  <div class="reveal">
-    <p class="section-label">03 / skills</p>
-    <h2>Built for the AI era</h2>
-    <p class="skills-note">I work where the industry is heading — agentic systems, LLM tooling, and cloud-scale data — on top of solid engineering fundamentals.</p>
-  </div>
-  <div class="skill-group reveal">
-    <h4>// AI &amp; agentic systems</h4>
-    <div class="chips">
-      <span class="chip chip-hot">Agentic Workflows</span>
-      <span class="chip chip-hot">AI Agents &amp; MCP</span>
-      <span class="chip chip-hot">RAG</span>
-      <span class="chip chip-hot">LangChain</span>
-      <span class="chip chip-hot">Claude Code</span>
-      <span class="chip chip-hot">OpenAI API</span>
-      <span class="chip chip-hot">Human-in-the-Loop AI</span>
-      <span class="chip chip-hot">PyTorch</span>
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="fn">ALLOC</span><span class="fn-go">&lt;GO&gt; asset allocation</span><h2>Skills</h2></div>
+    <p class="sub reveal">A diversified book, weighted toward generative AI and data infrastructure.</p>
+    <div class="reveal">
+      <div class="alloc-bar" id="alloc-bar"></div>
+      <div class="alloc-legend" id="alloc-legend"></div>
     </div>
-  </div>
-  <div class="skill-group reveal">
-    <h4>// cloud &amp; data engineering</h4>
-    <div class="chips">
-      <span class="chip">AWS (Certified Cloud Practitioner)</span>
-      <span class="chip">Kafka</span>
-      <span class="chip">Databricks</span>
-      <span class="chip">Snowflake SQL</span>
-      <span class="chip">Data Lakes</span>
-      <span class="chip">AWS Glue / Athena / S3 / EC2</span>
-      <span class="chip">Azure</span>
-      <span class="chip">Tableau</span>
-      <span class="chip">Power BI</span>
-      <span class="chip">FastAPI</span>
-    </div>
-  </div>
-  <div class="skill-group reveal">
-    <h4>// languages &amp; core</h4>
-    <div class="chips">
-      <span class="chip">Python</span>
-      <span class="chip">SQL</span>
-      <span class="chip">JavaScript</span>
-      <span class="chip">R</span>
-      <span class="chip">C</span>
-      <span class="chip">SwiftUI</span>
-      <span class="chip">Flutter / Dart</span>
-      <span class="chip">Frontend Development</span>
-    </div>
+    <div class="sectors" id="sectors"></div>
   </div>
 </section>
 
-<section id="projects">
-  <div class="reveal">
-    <p class="section-label">04 / projects</p>
-    <h2>Things I've built</h2>
-  </div>
-  <div class="projects-grid">
-    <a class="card reveal" href="https://www.youtube.com/watch?v=j6ofxc26VMc" target="_blank">
-      <span class="card-num">001</span>
-      <h3>KicNic — HealthHacks 2024</h3>
-      <p>Health-tracking app built on Apple HealthKit data. Engineered time-series features and trained an LSTM classifier to detect hand movements and track heart rate at 97% accuracy.</p>
-      <div class="tags"><span>PyTorch</span><span>Pandas</span><span>Swift</span><span>Firebase</span><span>React</span></div>
-      <span class="card-link">watch demo ↗</span>
-    </a>
-    <a class="card reveal" href="https://github.com/Vineel1015/Data-Migration-Project" target="_blank">
-      <span class="card-num">002</span>
-      <h3>YouTube Channel Analytics</h3>
-      <p>Data migration pipeline pulling channel and video stats through the YouTube Data v3 API, then cleaning, structuring, and visualizing engagement trends into an adjustable report.</p>
-      <div class="tags"><span>Python</span><span>YouTube API</span><span>Pandas</span><span>Seaborn</span></div>
-      <span class="card-link">view code ↗</span>
-    </a>
-    <div class="card reveal">
-      <span class="card-num">003</span>
-      <h3>Real-Time Stock Market Pipeline</h3>
-      <p>Streaming pipeline with Kafka producers, brokers, and consumers feeding AWS — partition-tuned for 50% faster retrieval, with cleaning and decomposition for time-series analysis.</p>
-      <div class="tags"><span>Kafka</span><span>Athena</span><span>S3</span><span>AWS Glue</span><span>EC2</span></div>
-    </div>
-    <div class="card reveal">
-      <span class="card-num">004</span>
-      <h3>Vertex Studio AI — Supervised ML</h3>
-      <p>Improved Gemini-Pro output quality by 30% on NYC open-park data tasks through better training-set correlation, and streamlined ETL to cut inference time 20% across 300 accounts.</p>
-      <div class="tags"><span>AWS</span><span>Databricks</span><span>FastAPI</span><span>Python</span></div>
+<section id="fundamentals">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="fn">FA</span><span class="fn-go">&lt;GO&gt; fundamentals</span><h2>Education &amp; credentials</h2></div>
+    <div class="fund-grid">
+      <div class="panel reveal">
+        <div class="panel-title"><span>RUTGERS UNIVERSITY · NEW BRUNSWICK</span><span>SEP 2022 — DEC 2026</span></div>
+        <div class="fund-num">
+          <div><div class="v up">4.00</div><div class="l">GPA / 4.00</div></div>
+          <div><div class="v">B.S.</div><div class="l">CS &amp; Data Analytics</div></div>
+          <div><div class="v amber">★</div><div class="l">Dean's List</div></div>
+        </div>
+        <div class="course">
+          <span class="chip">Time Series Modeling</span><span class="chip">Machine Learning Principles</span>
+          <span class="chip">Large-Scale Data Analytics</span><span class="chip">Data Mining for Business Intelligence</span>
+          <span class="chip">Database Management</span><span class="chip">Data Structures &amp; Algorithms</span>
+          <span class="chip">Systems Design</span><span class="chip">Cloud Architecture</span>
+        </div>
+      </div>
+      <div style="display:grid;gap:1rem;align-content:start">
+        <div class="panel reveal">
+          <div class="panel-title"><span>CERTIFICATIONS</span><span>RATING</span></div>
+          <ul class="kv">
+            <li><span>AWS Cloud Practitioner</span><span class="up">950 / 1000</span></li>
+            <li><span>Data Manipulation in SQL</span><span>✓</span></li>
+            <li><span>OOP in Python</span><span>✓</span></li>
+          </ul>
+        </div>
+        <div class="panel reveal">
+          <div class="panel-title"><span>AFTER HOURS</span><span>INTERESTS</span></div>
+          <div class="interests">
+            <span class="chip">📈 Markets</span><span class="chip">♟ Chess</span><span class="chip">⛳ Golf</span>
+            <span class="chip">🥾 Hiking</span><span class="chip">🏊 Swimming</span><span class="chip">🎣 Fishing</span>
+            <span class="chip">Sudoku</span><span class="chip">NYT Mini</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
 <section id="contact">
-  <div class="reveal">
-    <p class="section-label">05 / contact</p>
-    <h2>Let's talk</h2>
-    <p>Whether it's an opportunity, a collaboration, or just a good idea — my inbox is open.</p>
-    <a class="btn btn-primary" href="mailto:vineelnadakuditi@gmail.com">vineelnadakuditi@gmail.com</a>
-    <div class="socials">
-      <a href="https://github.com/Vineel1015" target="_blank">github</a>
-      <a href="https://www.linkedin.com/in/vineel-nadakuditi/" target="_blank">linkedin</a>
+  <div class="wrap">
+    <div class="sec-head reveal" style="justify-content:center;text-align:center"><span class="fn">MSG</span><span class="fn-go">&lt;GO&gt; order entry</span><h2>Let's talk</h2></div>
+    <div class="panel ticket reveal">
+      <div class="ticket-side"><span class="on">BUY</span><span>SELL</span></div>
+      <ul class="kv">
+        <li><span>Symbol</span><span>VNDK</span></li>
+        <li><span>Order type</span><span>Full-time · AI / Data Eng.</span></li>
+        <li><span>Graduating</span><span>December 2026</span></li>
+        <li><span>Location</span><span>New York</span></li>
+        <li><span>Time in force</span><span>GTC</span></li>
+      </ul>
+      <div class="ticket-actions">
+        <a class="btn btn-buy" href="mailto:vineelnadakuditi@gmail.com">Place order → vineelnadakuditi@gmail.com</a>
+        <div class="ticket-links">
+          <a class="btn btn-ghost" href="https://www.linkedin.com/in/vineel-nadakuditi/" target="_blank" rel="noopener">LinkedIn ↗</a>
+          <a class="btn btn-ghost" href="https://github.com/Vineel1015" target="_blank" rel="noopener">GitHub ↗</a>
+          <a class="btn btn-ghost" href="resume.pdf" target="_blank" rel="noopener">Résumé ↗</a>
+        </div>
+      </div>
     </div>
+    <p class="fine">Past performance is a strong indicator of future results.</p>
   </div>
 </section>
+</main>
 
-<footer>© 2026 Vineel Nadakuditi · built with anime.js</footer>
+<footer>
+  <div class="wrap">
+    <span>© 2026 Vineel Nadakuditi</span>
+    <span>Chart shows real GitHub commits · ticker shows career metrics, not market quotes.</span>
+  </div>
+</footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+<script src="commits.js"></script>
 <script>
-  // --- Split hero name into letters ---
-  const heroName = document.getElementById('hero-name');
-  heroName.innerHTML = heroName.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = s => document.querySelector(s);
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const el = (tag, attrs = {}, parent) => {
+    const n = document.createElementNS(svgNS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  };
 
-  // --- Intro timeline ---
-  anime.timeline({ easing: 'easeOutExpo' })
-    .add({ targets: '#navbar', opacity: [0, 1], translateY: [-20, 0], duration: 700 })
-    .add({ targets: '.eyebrow', opacity: [0, 1], translateX: [-20, 0], duration: 600 }, '-=400')
-    .add({
-      targets: '#hero-name .letter',
-      opacity: [0, 1],
-      translateY: [40, 0],
-      rotateZ: [8, 0],
-      duration: 900,
-      delay: anime.stagger(35)
-    }, '-=300')
-    .add({ targets: '.tagline', opacity: [0, 1], translateY: [20, 0], duration: 700 }, '-=500')
-    .add({ targets: '.hero-cta', opacity: [0, 1], translateY: [20, 0], duration: 700 }, '-=450')
-    .add({ targets: '.scroll-hint', opacity: [0, .8], duration: 600 }, '-=300');
-
-  // --- Scroll hint bob ---
-  anime({
-    targets: '.scroll-hint',
-    translateY: [0, 8],
-    direction: 'alternate',
-    loop: true,
-    duration: 900,
-    easing: 'easeInOutSine'
+  // --- Theme toggle ---
+  const root = document.documentElement;
+  try { const t = localStorage.getItem('theme'); if (t) root.dataset.theme = t; } catch (e) {}
+  $('#theme').addEventListener('click', () => {
+    const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.theme = dark ? 'light' : 'dark';
+    try { localStorage.setItem('theme', root.dataset.theme); } catch (e) {}
   });
 
-  // --- Floating morphing shapes in hero (circle → square → X → circle) ---
-  const header = document.querySelector('header');
-  const N = 24; // shared vertex count so shapes interpolate cleanly
-
-  // Circle: N points around a ring
-  const circlePts = Array.from({ length: N }, (_, i) => {
-    const a = (i / N) * Math.PI * 2 - Math.PI / 2;
-    return [50 + 45 * Math.cos(a), 50 + 45 * Math.sin(a)];
-  });
-  // Square: N points distributed along the perimeter (6 per side)
-  const squarePts = Array.from({ length: N }, (_, i) => {
-    const t = i / N * 4, side = Math.floor(t), f = t - side;
-    const lo = 5, hi = 95, d = hi - lo;
-    if (side === 0) return [lo + d * f, lo];
-    if (side === 1) return [hi, lo + d * f];
-    if (side === 2) return [hi - d * f, hi];
-    return [lo, hi - d * f];
-  });
-  // Plus/cross corners (rotated 45° later to read as an X), doubled to N points
-  const crossCorners = [
-    [38,2],[62,2],[62,38],[98,38],[98,62],[62,62],
-    [62,98],[38,98],[38,62],[2,62],[2,38],[38,38]
+  // --- Ticker tape (career metrics, not quotes) ---
+  const tape = [
+    ['VNDK', 'GPA 4.00', '▲ Dean\'s List'],
+    ['BMY', 'FTE HRS', '▼ 85%'],
+    ['SAVE', '$500K', '▲ per review'],
+    ['DATA', '90+ defects', '✓ resolved'],
+    ['R/W', 'THROUGHPUT', '▲ 25%'],
+    ['LLM-EVAL', '20 output types', '✓ judged'],
+    ['HACK', '1ST PLACE', '▲ $3,000'],
+    ['TA', '800+ students', '▲ led'],
+    ['AWS', '950/1000', '✓ certified'],
+    ['STRM', 'KAFKA', '▲ 50% faster'],
+    ['DOCR', '10-K AGENT', '● live']
   ];
-  const xPts = crossCorners.flatMap(p => [p, p]);
-  const toStr = pts => pts.map(p => p[0].toFixed(2) + ',' + p[1].toFixed(2)).join(' ');
 
-  const shapeSpecs = [
-    { size: 90,  top: '15%', left: '75%' },
-    { size: 40,  top: '65%', left: '85%' },
-    { size: 60,  top: '78%', left: '12%' },
-    { size: 26,  top: '25%', left: '55%' },
-    { size: 120, top: '55%', left: '65%' }
-  ];
-  shapeSpecs.forEach(s => {
-    const el = document.createElement('div');
-    el.className = 'shape';
-    Object.assign(el.style, { width: s.size + 'px', height: s.size + 'px', top: s.top, left: s.left });
-    el.innerHTML = '<svg viewBox="0 0 100 100"><polygon points="' + toStr(circlePts) + '"/></svg>';
-    header.appendChild(el);
-    const svg = el.querySelector('svg');
-    const poly = el.querySelector('polygon');
+  // --- Real NYSE session status (US/Eastern; ignores exchange holidays) ---
+  function marketStatus() {
+    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/New_York', weekday: 'short', hour: 'numeric', minute: 'numeric', hour12: false
+    }).formatToParts(new Date()).map(p => [p.type, p.value]));
+    const mins = (parseInt(parts.hour, 10) % 24) * 60 + parseInt(parts.minute, 10);
+    const weekday = !['Sat', 'Sun'].includes(parts.weekday);
+    let label = 'CLOSED', cls = '';
+    if (weekday && mins >= 570 && mins < 960) { label = 'OPEN'; cls = 'open'; }
+    else if (weekday && mins >= 240 && mins < 570) { label = 'PRE-MKT'; cls = 'ext'; }
+    else if (weekday && mins >= 960 && mins < 1200) { label = 'AFTER-HRS'; cls = 'ext'; }
+    $('#mkt-dot').className = 'dot ' + cls;
+    $('#mkt-label').textContent = 'NYSE ' + label;
+    $('#mkt-time').textContent = String(parts.hour % 24).padStart(2, '0') + ':' + parts.minute + ' ET';
+  }
+  marketStatus(); setInterval(marketStatus, 30000);
 
-    // Gentle drift (wrapper only, so it never fights the morph)
-    anime({
-      targets: el,
-      translateY: anime.random(-30, 30),
-      translateX: anime.random(-25, 25),
-      scale: [1, anime.random(85, 115) / 100],
-      direction: 'alternate',
-      loop: true,
-      duration: anime.random(3000, 6000),
-      easing: 'easeInOutSine'
-    });
+  // --- GitHub commit chart (data from commits.js, regenerated by scripts/update_commits.py) ---
+  const C = window.COMMITS;
+  if (!C) $('.quote').remove(); // commits.js missing: drop the chart, keep the page
+  else {
+    const DAY = 864e5;
+    const weekDate = i => new Date(Date.parse(C.start + 'T00:00:00') + i * 7 * DAY);
+    const fmt = (d, o) => d.toLocaleDateString('en-US', o || { month: 'short', day: 'numeric', year: 'numeric' });
+    const N = C.weeks.length;
+    const cum = [];
+    C.weeks.reduce((a, v, i) => (cum[i] = a + v), 0);
+    const lastActive = C.weeks.map((v, i) => v ? i : -1).filter(i => i >= 0).pop();
+    const recent = C.weeks.slice(-4).reduce((a, b) => a + b, 0);
+    const repoCount = Object.keys(C.repos).length;
+    const reposInWeek = i => Object.entries(C.repos).filter(([, r]) => r.weeks[i])
+      .sort((a, b) => b[1].weeks[i] - a[1].weeks[i]).map(([n, r]) => `${n} · ${r.weeks[i]}`);
 
-    // Bouncy morph cycle, each shape on its own rhythm
-    const bounce = 'easeOutElastic(1, ' + (anime.random(45, 75) / 100) + ')';
-    const dur = () => anime.random(1100, 1900);
-    const hold = () => anime.random(400, 1600);
-    anime.timeline({ loop: true, delay: anime.random(0, 2500) })
-      .add({ targets: poly, points: toStr(squarePts), duration: dur(), easing: bounce })
-      .add({ targets: svg, rotate: 45, duration: dur(), easing: bounce }, '+=' + hold())
-      .add({ targets: poly, points: toStr(xPts), duration: dur(), easing: bounce }, '-=' + 600)
-      .add({ targets: poly, points: toStr(circlePts), duration: dur(), easing: bounce }, '+=' + hold())
-      .add({ targets: svg, rotate: 0, duration: dur(), easing: bounce }, '-=' + 800)
-      .add({ duration: hold() }); // breather before looping
-  });
+    $('#q-big').textContent = C.total;
+    $('#q-chg').textContent = `▲ +${recent} last 4 wks`;
+    $('#q-asof').textContent = 'as of ' + fmt(new Date(C.generated));
+    $('#s-total').textContent = C.total;
+    $('#s-repos').textContent = repoCount;
+    $('#s-weeks').textContent = C.weeks.filter(Boolean).length;
+    $('#s-last').textContent = fmt(weekDate(lastActive), { month: 'short', year: 'numeric' });
 
-  // --- Scroll-triggered reveals ---
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        anime({
-          targets: entry.target,
-          opacity: [0, 1],
-          translateY: [36, 0],
-          duration: 800,
-          delay: i * 120,
-          easing: 'easeOutExpo'
-        });
-        observer.unobserve(entry.target);
+    tape.unshift(['GH', `${C.total} commits`, `▲ +${recent} 4w`], ['REPOS', `${repoCount} public`, '● shipping']);
+
+    // Career events drawn as markers on the time axis
+    const events = [
+      { d: '2024-11-09', t: 'HealthHack win', side: 'end' },
+      { d: '2025-01-21', t: 'Head TA', side: 'start' },
+      { d: '2026-05-18', t: 'Joined BMS', side: 'end' }
+    ].map(e => ({ ...e, i: (Date.parse(e.d) - Date.parse(C.start)) / (7 * DAY) }));
+
+    const svg = $('#chart-svg'), tip = $('#tip');
+    const W = 600, H = 260, P = { l: 8, r: 40, t: 34, b: 22 };
+    const VOL = 50; // px reserved for weekly volume bars
+    let range = 0;
+
+    function draw() {
+      svg.innerHTML = '';
+      const from = range ? Math.max(0, N - range) : 0;
+      const span = Math.max(1, N - 1 - from);
+      const lo = from ? cum[from - 1] : 0, hi = cum[N - 1];
+      const x = i => P.l + (i - from) / span * (W - P.l - P.r);
+      const priceBot = H - P.b - VOL - 10;
+      const y = v => P.t + (1 - (v - lo) / Math.max(1, hi - lo)) * (priceBot - P.t);
+      const maxVol = Math.max(1, ...C.weeks.slice(from));
+      const vy = v => H - P.b - v / maxVol * VOL;
+
+      const defs = el('defs', {}, svg);
+      const g = el('linearGradient', { id: 'fill', x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
+      el('stop', { offset: '0%', 'stop-color': 'var(--up)', 'stop-opacity': .25 }, g);
+      el('stop', { offset: '100%', 'stop-color': 'var(--up)', 'stop-opacity': 0 }, g);
+
+      // price gridlines with right-axis labels
+      for (let k = 0; k <= 3; k++) {
+        const gy = P.t + k * (priceBot - P.t) / 3;
+        el('line', { x1: P.l, x2: W - P.r, y1: gy, y2: gy, class: 'gridline' }, svg);
+        if (k) el('text', { x: W - P.r + 6, y: gy + 3, class: 'axis' }, svg).textContent = Math.round(hi - k * (hi - lo) / 3);
       }
-    });
-  }, { threshold: 0.15 });
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+      el('line', { x1: P.l, x2: W - P.r, y1: H - P.b, y2: H - P.b, class: 'gridline' }, svg);
 
-  // --- Animated stat counters (count up when scrolled into view) ---
-  const counterObs = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      const el = entry.target;
-      const target = parseInt(el.dataset.count, 10);
-      const prefix = el.dataset.prefix || '';
-      const suffix = el.dataset.suffix || '';
-      const state = { val: 0 };
-      anime({
-        targets: state,
-        val: target,
-        round: 1,
-        duration: 1600,
-        easing: 'easeOutExpo',
-        update: () => { el.textContent = prefix + state.val.toLocaleString() + suffix; }
+      // time axis: years, or months when zoomed in
+      const monthly = range && range <= 13;
+      let prev = null;
+      for (let i = from; i < N; i++) {
+        const d = weekDate(i);
+        const key = monthly ? fmt(d, { month: 'short' }) : String(d.getFullYear());
+        if (key === prev) continue;
+        prev = key;
+        if (i === from) continue; // only label period boundaries, not the partial first period
+        el('line', { x1: x(i), x2: x(i), y1: P.t, y2: H - P.b, class: 'gridline' }, svg);
+        el('text', { x: x(i) + 3, y: H - 7, class: 'axis' }, svg).textContent = key;
+      }
+
+      // weekly volume bars
+      const bw = Math.max(2, (W - P.l - P.r) / (span + 1) * .7);
+      for (let i = from; i < N; i++) if (C.weeks[i]) {
+        el('rect', { x: x(i) - bw / 2, y: vy(C.weeks[i]), width: bw, height: H - P.b - vy(C.weeks[i]), rx: 1, class: 'vol', 'data-i': i }, svg);
+      }
+
+      // cumulative commits as a step line
+      let d = `M${x(from)} ${y(lo)}`;
+      for (let i = from; i < N; i++) d += `H${x(i).toFixed(1)}V${y(cum[i]).toFixed(1)}`;
+      el('path', { d: d + `V${priceBot}H${x(from)}Z`, fill: 'url(#fill)' }, svg);
+      const line = el('path', { d, class: 'line' }, svg);
+
+      // last-value tag on the right axis, like a quote screen
+      el('rect', { x: W - P.r + 2, y: y(hi) - 8, width: 36, height: 16, rx: 3, fill: 'var(--up)' }, svg);
+      el('text', { x: W - P.r + 20, y: y(hi) + 3.5, 'text-anchor': 'middle', 'font-family': 'JetBrains Mono', 'font-size': 10, 'font-weight': 700, fill: '#fff' }, svg).textContent = hi;
+
+      events.filter(e => e.i >= from && e.i < N).forEach(e => {
+        const ge = el('g', { class: 'ev' }, svg);
+        el('line', { x1: x(e.i), x2: x(e.i), y1: P.t - 14, y2: H - P.b }, ge);
+        el('path', { d: `M${x(e.i)} ${P.t - 24}l4 4l-4 4l-4 -4z` }, ge);
+        const side = x(e.i) < 100 ? 'start' : x(e.i) > W - P.r - 90 ? 'end' : e.side;
+        el('text', { x: x(e.i) + (side === 'end' ? -8 : 8), y: P.t - 16, class: 'axis', 'text-anchor': side }, ge).textContent = e.t;
       });
-      counterObs.unobserve(el);
-    });
-  }, { threshold: 0.6 });
-  document.querySelectorAll('.num[data-count]').forEach(el => counterObs.observe(el));
 
-  // --- Skill chips pop in with stagger ---
-  const chipObs = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      anime({
-        targets: entry.target.querySelectorAll('.chip'),
-        opacity: [0, 1],
-        scale: [0.6, 1],
-        translateY: [12, 0],
-        duration: 700,
-        delay: anime.stagger(55),
-        easing: 'easeOutElastic(1, .7)'
-      });
-      chipObs.unobserve(entry.target);
-    });
-  }, { threshold: 0.3 });
-  document.querySelectorAll('.chips').forEach(el => chipObs.observe(el));
+      const xh = el('line', { class: 'xhair', y1: P.t, y2: H - P.b, opacity: 0 }, svg);
 
-  // --- Playful logo hover ---
-  document.querySelector('.logo').addEventListener('mouseenter', () => {
-    anime({ targets: '.logo', scale: [1, 1.12, 1], duration: 450, easing: 'easeOutBack' });
+      if (!reduce) {
+        const len = line.getTotalLength();
+        line.style.strokeDasharray = len; line.style.strokeDashoffset = len;
+        line.getBoundingClientRect();
+        line.style.transition = 'stroke-dashoffset 1.6s cubic-bezier(.3,.7,.2,1)';
+        line.style.strokeDashoffset = 0;
+      }
+
+      const move = e => {
+        const box = svg.getBoundingClientRect();
+        const px = (e.touches ? e.touches[0].clientX : e.clientX) - box.left;
+        const i = Math.min(N - 1, Math.max(from, Math.round(from + (px / box.width * W - P.l) / (W - P.l - P.r) * span)));
+        svg.querySelectorAll('.vol').forEach(b => b.classList.toggle('hot', +b.dataset.i === i));
+        xh.setAttribute('x1', x(i)); xh.setAttribute('x2', x(i)); xh.setAttribute('opacity', 1);
+        const repos = reposInWeek(i);
+        tip.innerHTML = `<b>Week of ${fmt(weekDate(i))}</b>${C.weeks[i]} commits · ${cum[i]} total` +
+          (repos.length ? '<br>' + repos.slice(0, 3).join('<br>') : '');
+        tip.style.left = Math.min(Math.max(x(i) / W * box.width, 90), box.width - 90) + 'px';
+        tip.style.top = (y(cum[i]) / H * box.height + 8) + 'px';
+        tip.style.opacity = 1;
+      };
+      svg.onmousemove = move; svg.ontouchmove = move;
+      svg.onmouseleave = () => {
+        tip.style.opacity = 0; xh.setAttribute('opacity', 0);
+        svg.querySelectorAll('.vol.hot').forEach(b => b.classList.remove('hot'));
+      };
+    }
+    draw();
+    $('#ranges').addEventListener('click', e => {
+      if (!e.target.dataset.r) return;
+      document.querySelectorAll('#ranges button').forEach(b => b.classList.toggle('on', b === e.target));
+      range = +e.target.dataset.r; draw();
+    });
+
+    // --- Per-repo commit strips on project cards (last 26 weeks) ---
+    document.querySelectorAll('.spark[data-repo]').forEach(s => {
+      const r = C.repos[s.dataset.repo];
+      if (!r) { s.remove(); return; }
+      const wk = r.weeks.slice(-26), max = Math.max(1, ...wk);
+      const bars = wk.map((v, i) => {
+        const h = v ? Math.max(4, v / max * 22) : 1;
+        return `<rect${v ? '' : ' class="base"'} x="${i * 3}" y="${22 - h}" width="2" height="${h}"/>`;
+      }).join('');
+      s.innerHTML = `<span>${r.total} commit${r.total === 1 ? '' : 's'}</span><svg viewBox="0 0 78 22" aria-hidden="true">${bars}</svg>`;
+      s.title = `${r.total} commits to ${s.dataset.repo}; bars show the last 26 weeks`;
+    });
+  }
+  document.querySelectorAll('.spark[data-repo]:empty').forEach(s => s.remove());
+  const tapeHTML = tape.map(([s, v, c]) => `<span class="tape-item"><b>${s}</b>${v} <span class="chg">${c}</span></span>`).join('');
+  $('#tape').innerHTML = tapeHTML + tapeHTML;
+
+  // --- Project filters ---
+  $('#filters').addEventListener('click', e => {
+    const f = e.target.dataset.f; if (!f) return;
+    document.querySelectorAll('#filters button').forEach(b => b.classList.toggle('on', b === e.target));
+    document.querySelectorAll('.pos').forEach(p => p.classList.toggle('hidden', f !== 'all' && !p.dataset.cat.split(' ').includes(f)));
   });
+
+  // --- Skills allocation (weights = share of listed skills per sector) ---
+  const sectors = [
+    { n: 'Generative AI', c: '#22c98a', s: ['LLM Integration', 'Prompt Engineering', 'LangGraph', 'LangChain', 'RAG', 'MCP', 'AI Agents', 'LLM-as-a-Judge', 'Human-in-the-Loop', 'Claude / OpenAI APIs'] },
+    { n: 'Data Engineering', c: '#3b82f6', s: ['Data Pipelines', 'Kafka', 'PostgreSQL', 'Data Governance', 'Data Quality', 'Databricks', 'Snowflake', 'Feature Engineering'] },
+    { n: 'Cloud & Infra', c: '#ffae2b', s: ['AWS', 'Docker', 'Terraform', 'FastAPI', 'Linux', 'Git', 'OAuth 2.0'] },
+    { n: 'Analytics & ML', c: '#a855f7', s: ['PyTorch', 'Statistical Analysis', 'Time Series', 'Dashboards', 'Tableau', 'Excel'] },
+    { n: 'Languages', c: '#f0555f', s: ['Python', 'SQL', 'TypeScript', 'JavaScript', 'R', 'Swift'] }
+  ];
+  const total = sectors.reduce((a, s) => a + s.s.length, 0);
+  $('#alloc-bar').innerHTML = sectors.map(s => `<div style="background:${s.c}" data-w="${(s.s.length / total * 100).toFixed(1)}"></div>`).join('');
+  $('#alloc-legend').innerHTML = sectors.map(s => `<span><i style="background:${s.c}"></i>${s.n} ${(s.s.length / total * 100).toFixed(0)}%</span>`).join('');
+  $('#sectors').innerHTML = sectors.map(s => `
+    <div class="panel sector reveal">
+      <h4><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${s.c};margin-right:.5rem"></i>${s.n}</span><span>${s.s.length} holdings</span></h4>
+      <div class="chips">${s.s.map(x => `<span class="chip">${x}</span>`).join('')}</div>
+    </div>`).join('');
+
+  // --- Count-up numbers ---
+  const countUp = n => {
+    const target = +n.dataset.count, pre = n.dataset.prefix || '', suf = n.dataset.suffix || '';
+    if (reduce) { n.textContent = pre + target.toLocaleString() + suf; return; }
+    const t0 = performance.now(), dur = 1400;
+    const step = t => {
+      const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 4);
+      n.textContent = pre + Math.round(target * e).toLocaleString() + suf;
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
+  // --- Scroll reveals ---
+  const io = new IntersectionObserver(entries => entries.forEach(en => {
+    if (!en.isIntersecting) return;
+    en.target.classList.add('in');
+    en.target.querySelectorAll('[data-count]').forEach(countUp);
+    if (en.target.querySelector('#alloc-bar')) document.querySelectorAll('#alloc-bar div').forEach(b => b.style.width = b.dataset.w + '%');
+    io.unobserve(en.target);
+  }), { threshold: .12 });
+  document.querySelectorAll('.reveal').forEach(n => io.observe(n));
+
+  // --- Active nav link ---
+  const links = [...document.querySelectorAll('#navlinks a')];
+  const navIO = new IntersectionObserver(entries => entries.forEach(en => {
+    if (en.isIntersecting) links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id));
+  }), { rootMargin: '-45% 0px -50% 0px' });
+  document.querySelectorAll('main section').forEach(s => navIO.observe(s));
+})();
 </script>
 </body>
 </html>
